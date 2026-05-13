@@ -1,0 +1,7 @@
+# One Metaculus question URL or bare ID per line.
+# Lines starting with `#` and blank lines are ignored.
+# Browse metaculus.com for resolved questions and paste links here.
+#
+# Examples:
+# https://www.metaculus.com/questions/1234/some-question-slug/
+# 5678

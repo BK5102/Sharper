@@ -29,19 +29,25 @@ Output is JSON by default; pass `--pretty` for the rich-formatted view.
 
 ## Collecting the held-out question set
 
-The Phase 1 exit criterion needs 30-50 real Metaculus questions with `ambiguous` / `clean` labels. The fetcher pulls recently-resolved ones for you to annotate.
+The Phase 1 exit criterion needs 30-50 real Metaculus questions with `ambiguous` / `clean` labels. The fetcher expands a list of question URLs (or IDs) into the Sharper JSONL shape.
+
+Why a URL list and not bulk-pull: Metaculus's `/api2/questions/` list filters are too limited to surface resolved questions reliably, but the per-question detail endpoint works fine. Curating during browsing is also the right UX — you want to *pick* known-disputed questions, not random recent ones.
 
 ```bash
-# 1. Add METACULUS_API_TOKEN to .env (free token at metaculus.com profile page)
-# 2. Pull 50 most-recently-resolved questions:
-python -m scripts.fetch_metaculus --limit 50 --out data/questions.metaculus.jsonl
-
-# 3. Open the file and fill in label + notes for each row.
-#    label: "ambiguous" if the resolution was disputed, "clean" if not
-#    notes: one-line summary of what went wrong (for ambiguous ones)
+# 1. Add METACULUS_API_TOKEN to .env (free token at metaculus.com profile page).
+# 2. Browse metaculus.com for resolved questions. Especially look for ones with
+#    comment threads where forecasters argued about the resolution -- those are
+#    your known-ambiguous targets. Aim for ~25 ambiguous + ~25 clean.
+# 3. Paste one URL (or bare ID) per line into data/ids.txt:
+#       https://www.metaculus.com/questions/1234/some-question-slug/
+#       5678
+#       # lines starting with # are ignored
+# 4. Expand into JSONL:
+python -m scripts.fetch_metaculus --ids-file data/ids.txt --out data/questions.metaculus.jsonl
+# 5. Open the JSONL and fill in `label` (ambiguous | clean) and `notes` per row.
 ```
 
-If Metaculus changes the API shape, run `--raw-first` to dump the first raw record and adjust `_to_record()` in [scripts/fetch_metaculus.py](scripts/fetch_metaculus.py).
+Debug helper: `python -m scripts.fetch_metaculus --id 1 --raw-first` dumps the first raw API record — handy if Metaculus changes the schema and `_to_record()` needs updating.
 
 ## Layout
 

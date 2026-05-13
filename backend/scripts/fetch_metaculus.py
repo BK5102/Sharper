@@ -1,22 +1,28 @@
-"""Fetch resolved Metaculus questions into a JSONL file for rubric annotation.
+"""Fetch Metaculus questions by URL/ID into a JSONL file for rubric annotation.
 
-The Metaculus API requires a token (free account at metaculus.com -> profile -> API token).
-Put it in `backend/.env` as `METACULUS_API_TOKEN=...`.
+Why per-ID and not bulk-list:
+    The /api2/questions/ list endpoint's filters are too limited to find resolved
+    questions reliably (the `status` filter only accepts open/closed and is dominated
+    by recent unresolved bot questions). The per-question detail endpoint works fine,
+    so the workflow is:
+
+    1. Browse metaculus.com for resolved questions — especially ones with comment
+       threads where forecasters argued about the resolution (these are your
+       known-ambiguous targets).
+    2. Copy each question URL (or just the ID) into `data/ids.txt`, one per line.
+    3. Run this script to expand them into the Sharper JSONL shape.
+    4. Edit the JSONL to set `label` (`ambiguous` / `clean`) and `notes` per row.
+
+Setup:
+    Put METACULUS_API_TOKEN in backend/.env (free token at metaculus.com profile page).
 
 Usage:
-    python -m scripts.fetch_metaculus --limit 50 --out data/questions.metaculus.jsonl
-    python -m scripts.fetch_metaculus --limit 5 --raw-first   # debug: print first raw record
+    python -m scripts.fetch_metaculus --ids-file data/ids.txt --out data/questions.metaculus.jsonl
+    cat data/ids.txt | python -m scripts.fetch_metaculus --out data/questions.metaculus.jsonl
+    python -m scripts.fetch_metaculus --id 1 --raw-first   # debug: dump one raw record
 
-Each output record has:
-    id, source_url, title, resolution_criteria, background, fine_print,
-    resolution, close_time, resolve_time, label, notes
-
-`label` and `notes` are emitted empty -- fill them in manually after fetching.
-Use label values 'ambiguous' (for known-disputed) or 'clean' (cleanly resolved);
-put a one-line summary of what went wrong in `notes` for ambiguous ones.
-
-Metaculus changes the API shape periodically. If `--raw-first` shows a field name
-this script doesn't recognize, edit `_to_record()` below.
+Each input line is either a full Metaculus question URL or just the numeric ID.
+Lines beginning with `#` and blank lines are ignored.
 """
 
 from __future__ import annotations
@@ -24,17 +30,37 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
 from dotenv import load_dotenv
 
-API_BASE = "https://www.metaculus.com/api2/questions/"
+# Force UTF-8 on stdout so --raw-first can print question text with smart quotes,
+# em-dashes, etc. on Windows consoles that default to cp1252.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
+API_DETAIL = "https://www.metaculus.com/api2/questions/{id}/"
 DEFAULT_OUT = Path("data/questions.metaculus.jsonl")
+URL_ID_RE = re.compile(r"metaculus\.com/questions/(\d+)", re.IGNORECASE)
+
+
+def parse_id(line: str) -> int | None:
+    """Extract a numeric question ID from a URL or bare-ID line. None for blanks/comments."""
+    stripped = line.strip()
+    if not stripped or stripped.startswith("#"):
+        return None
+    if stripped.isdigit():
+        return int(stripped)
+    m = URL_ID_RE.search(stripped)
+    if m:
+        return int(m.group(1))
+    return None
 
 
 def _http_get(url: str, token: str) -> dict[str, Any]:
@@ -51,7 +77,7 @@ def _http_get(url: str, token: str) -> dict[str, Any]:
             return json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
         body = e.read().decode("utf-8", errors="replace")[:500]
-        raise SystemExit(f"Metaculus API {e.code}: {body}") from e
+        raise SystemExit(f"Metaculus API {e.code} on {url}: {body}") from e
 
 
 def _first(d: dict[str, Any], *keys: str, default: Any = None) -> Any:
@@ -65,8 +91,7 @@ def _first(d: dict[str, Any], *keys: str, default: Any = None) -> Any:
 def _to_record(q: dict[str, Any]) -> dict[str, Any]:
     """Transform a raw Metaculus question into the Sharper JSONL shape.
 
-    Tries the legacy `/api2/questions/` flat shape AND the newer nested
-    {question: {...}} shape, so the script keeps working across API revisions.
+    Handles both the legacy flat shape and the newer nested {question: {...}} shape.
     """
     inner = q.get("question") if isinstance(q.get("question"), dict) else q
 
@@ -87,44 +112,51 @@ def _to_record(q: dict[str, Any]) -> dict[str, Any]:
         "fine_print": _first(inner, "fine_print"),
         "resolution": _first(inner, "resolution"),
         "close_time": _first(inner, "scheduled_close_time", "close_time"),
-        "resolve_time": _first(inner, "actual_resolve_time", "scheduled_resolve_time", "resolve_time"),
+        "resolve_time": _first(
+            q, "actual_resolve_time", "scheduled_resolve_time",
+        ) or _first(inner, "actual_resolve_time", "scheduled_resolve_time"),
         "label": "",
         "notes": "",
     }
 
 
-def fetch(token: str, limit: int, status: str, order_by: str) -> list[dict[str, Any]]:
-    """Page through the API until we've collected `limit` records."""
-    params = {
-        "limit": min(100, limit),
-        "status": status,
-        "order_by": order_by,
-    }
-    url: str | None = f"{API_BASE}?{urllib.parse.urlencode(params)}"
-    out: list[dict[str, Any]] = []
-    while url and len(out) < limit:
-        page = _http_get(url, token)
-        results = page.get("results") or []
-        if not results:
-            break
-        out.extend(results)
-        url = page.get("next")
-    return out[:limit]
+def fetch_by_ids(token: str, ids: Iterable[int]) -> Iterable[dict[str, Any]]:
+    """Fetch each question ID via the detail endpoint. Yields raw API records."""
+    for qid in ids:
+        url = API_DETAIL.format(id=qid)
+        yield _http_get(url, token)
+
+
+def _read_ids(args: argparse.Namespace) -> list[int]:
+    """Collect IDs from --id, --ids-file, or stdin (in that order)."""
+    if args.id is not None:
+        return [args.id]
+    lines: list[str]
+    if args.ids_file is not None:
+        if not args.ids_file.exists():
+            raise SystemExit(f"error: ids file not found: {args.ids_file}")
+        lines = args.ids_file.read_text(encoding="utf-8").splitlines()
+    elif not sys.stdin.isatty():
+        lines = sys.stdin.read().splitlines()
+    else:
+        raise SystemExit(
+            "error: no IDs provided. Pass --id N, --ids-file PATH, or pipe URLs/IDs on stdin."
+        )
+    ids: list[int] = []
+    for ln in lines:
+        qid = parse_id(ln)
+        if qid is not None:
+            ids.append(qid)
+    if not ids:
+        raise SystemExit("error: no valid question IDs found in input.")
+    return ids
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--limit", type=int, default=50, help="How many questions to fetch.")
+    parser.add_argument("--id", type=int, help="Fetch a single question by ID.")
     parser.add_argument(
-        "--status",
-        default="resolved",
-        choices=("resolved", "closed", "open"),
-        help="Filter by question status.",
-    )
-    parser.add_argument(
-        "--order-by",
-        default="-resolve_time",
-        help="API order_by value (e.g. '-resolve_time' for most recently resolved).",
+        "--ids-file", type=Path, help="File of question URLs/IDs, one per line."
     )
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT, help="Output JSONL path.")
     parser.add_argument(
@@ -144,25 +176,27 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 2
 
-    raw = fetch(token, limit=args.limit, status=args.status, order_by=args.order_by)
-    if not raw:
-        print("error: API returned no results -- check your query parameters", file=sys.stderr)
-        return 1
+    ids = _read_ids(args)
 
     if args.raw_first:
-        print(json.dumps(raw[0], indent=2, ensure_ascii=False))
+        first_raw = next(iter(fetch_by_ids(token, ids[:1])))
+        print(json.dumps(first_raw, indent=2, ensure_ascii=False))
         return 0
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    written = 0
+    written = skipped = 0
     with args.out.open("w", encoding="utf-8") as f:
-        for q in raw:
-            record = _to_record(q)
+        for raw in fetch_by_ids(token, ids):
+            record = _to_record(raw)
             if not record.get("title"):
+                skipped += 1
                 continue
             f.write(json.dumps(record, ensure_ascii=False) + "\n")
             written += 1
-    print(f"wrote {written} questions to {args.out}", file=sys.stderr)
+    msg = f"wrote {written} questions to {args.out}"
+    if skipped:
+        msg += f" ({skipped} skipped for missing title)"
+    print(msg, file=sys.stderr)
     return 0
 
 
