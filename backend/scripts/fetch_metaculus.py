@@ -166,7 +166,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    load_dotenv()
+    load_dotenv(override=True)
     token = os.getenv("METACULUS_API_TOKEN")
     if not token:
         print(

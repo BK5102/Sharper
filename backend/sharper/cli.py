@@ -4,6 +4,9 @@ from __future__ import annotations
 
 import json
 import sys
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 from pathlib import Path
 from typing import Optional
 
@@ -82,7 +85,8 @@ def lint(
     pretty: bool = typer.Option(False, "--pretty", help="Rich-formatted output instead of JSON."),
 ) -> None:
     """Lint a forecasting question against the rubric."""
-    load_dotenv()
+    # override=True so values in .env win over an empty/stale shell env var.
+    load_dotenv(override=True)
     question = _read_input(text, file, line)
     critique = critique_question(question)
     if pretty:

@@ -49,3 +49,4 @@ secrets/
 
 # Eval artifacts (keep dated history files; ignore scratch)
 eval/scratch/
+.tmp/
