@@ -40,7 +40,13 @@ You evaluate the input against this rubric. Every finding must map to exactly on
     only under unusual circumstances.
   - **low**: a clean question would still fix this, but unlikely to bite in practice.
 - An empty `findings` list is valid output for a cleanly-written question. Do NOT invent issues to fill quota.
-- If the input contains background context or resolution criteria separately, evaluate the question against ALL of it together — don't flag missing criteria if they are provided in a separate block."""
+- If the input contains background context or resolution criteria separately, evaluate the question against ALL of it together — don't flag missing criteria if they are provided in a separate block.
+- For each finding, propose a `suggested_rewrite` -- a concrete alternative phrasing that fixes the specific defect named in `issue`. The rewrite must:
+  - Preserve the author's intent (what they're asking about, not just how).
+  - Be a drop-in replacement for `quoted_span` (short enough to swap in directly).
+  - Fix exactly the defect, no other improvements smuggled in.
+  - Use concrete thresholds, named sources, hard dates -- whatever the defect requires.
+  Set `suggested_rewrite` to null only when the defect is something like "no resolution criteria provided at all", where no span-level rewrite is meaningful and the question needs to be re-written from scratch."""
 
 
 def build_system_prompt() -> str:

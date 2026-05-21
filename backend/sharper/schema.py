@@ -51,6 +51,18 @@ class Finding(BaseModel):
             "with reference to the rubric item's definition."
         )
     )
+    suggested_rewrite: str | None = Field(
+        default=None,
+        description=(
+            "A concrete alternative phrasing that fixes this specific defect while preserving "
+            "the author's intent (what they're asking about, not just how). Should typically "
+            "be a drop-in replacement for `quoted_span` -- short enough to swap in directly. "
+            "Fix exactly the defect named in `issue`; do not smuggle in other improvements. "
+            "Set to null only when the defect requires writing new content from scratch "
+            "(e.g. 'no resolution criteria provided at all') and no span-level rewrite is "
+            "meaningful."
+        ),
+    )
 
 
 class Critique(BaseModel):
