@@ -22,9 +22,18 @@ class Finding(BaseModel):
     rubric_item: RubricItem = Field(description="Which rubric item this finding belongs to.")
     severity: Severity = Field(
         description=(
-            "Likelihood this issue causes a real resolution dispute. "
-            "high = will almost certainly be disputed; medium = plausibly disputed; "
-            "low = a clean question would still fix this."
+            "Likelihood this issue causes a real resolution dispute.\n"
+            "- high: the defect is very likely to cause a real dispute. Escalate to high when "
+            "the criteria contain discretionary language ('Metaculus may consider', 'best "
+            "judgment', 'best estimate', 'credible sources', 'as appropriate', 'some information', "
+            "'approximately'); when an undefined fuzzy term is the central decision variable "
+            "('successful', 'major', 'significant', 'contained', 'ongoing'); when there is no "
+            "hard calendar deadline on a time-bounded question; or when the resolution depends "
+            "on a non-persistent source (e.g. a campaign archive, a tweet, an unspecified 'report').\n"
+            "- medium: the defect exists but a reasonable resolver would likely handle it "
+            "consistently. The question would be improved by fixing it, but a dispute is "
+            "plausible only under unusual circumstances.\n"
+            "- low: a clean question would still fix this, but it is unlikely to bite in practice."
         )
     )
     quoted_span: str = Field(

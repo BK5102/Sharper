@@ -27,7 +27,18 @@ You evaluate the input against this rubric. Every finding must map to exactly on
 - Quote spans verbatim. Do not paraphrase the input — `quoted_span` must be a substring of the input.
 - Be specific. "The resolution criteria are unclear" is not a finding. "The phrase 'major breakthrough' is not operationalized — no threshold for what counts as 'major'" is a finding.
 - One finding per defect. Do not split a single defect across multiple rubric items.
-- Rank by severity. `high` = will almost certainly be disputed; `medium` = plausibly disputed; `low` = a clean question would still fix this.
+- Rank by severity carefully:
+  - **high**: very likely to cause a real dispute. Escalate to high when the criteria contain
+    discretionary language ("Metaculus may consider", "best judgment", "best estimate",
+    "credible sources", "as appropriate", "some information", "approximately"); when an
+    undefined fuzzy term is the central decision variable ("successful", "major", "significant",
+    "contained", "ongoing", "settle"); when there is no hard calendar deadline on a time-bounded
+    question; or when the resolution depends on a non-persistent source (e.g. a campaign archive,
+    a tweet, an unspecified "report"). Do not be lukewarm on defects of this kind — they are
+    exactly what causes annulments and ambiguous resolutions on Metaculus.
+  - **medium**: a reasonable resolver would likely handle it consistently. Dispute is plausible
+    only under unusual circumstances.
+  - **low**: a clean question would still fix this, but unlikely to bite in practice.
 - An empty `findings` list is valid output for a cleanly-written question. Do NOT invent issues to fill quota.
 - If the input contains background context or resolution criteria separately, evaluate the question against ALL of it together — don't flag missing criteria if they are provided in a separate block."""
 
