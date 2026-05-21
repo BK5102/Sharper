@@ -193,7 +193,7 @@ This took the most iteration. The summary:
 
 ---
 
-## 8. Current state (as of 2026-05-21)
+## 8. Current state (as of 2026-05-21, post-relabel + meta-strip)
 
 **Built and working:**
 - ✅ Backend scaffold (`pyproject.toml`, `sharper/` package, tests)
@@ -204,10 +204,11 @@ This took the most iteration. The summary:
 - ✅ Metaculus per-ID fetcher with URL/ID list input + UTF-8 stdout
 - ✅ Claude-in-Chrome scraper prompt + JS extractor for full criteria text
 - ✅ Eval harness with three-severity recall + FP metrics, dated run JSON history
-- ✅ 19-question labeled held-out set (9 ambiguous + 10 clean)
-- ✅ First eval run committed (`eval/runs/2026-05-20-220054.json`)
+- ✅ **Resolver-meta-note stripper** in `run_eval.py` (drops paragraphs with "Note: This question was resolved ambiguous", "title and resolution criteria clash", etc.) — prevents gold-label leakage in question 2750-style cases
+- ✅ 19-question labeled held-out set (**14 ambiguous + 5 clean** after relabeling 5 marginal rows)
+- ✅ Two eval runs committed
 
-**Phase 1 status**: pipeline confirmed end-to-end; recall@high = 22% (below 70% target), FP@high = 0.9/clean (at spec line). Headline 100% recall@low is "flag everything" — not real discrimination. See §9 next-steps.
+**Phase 1 status**: pipeline producing real discrimination now. See §9 for current numbers.
 
 **Not yet built:**
 - Phase 2: suggested rewrites, eval harness with per-row "actual disputed issue" annotations, blind reviewer protocol
@@ -216,21 +217,37 @@ This took the most iteration. The summary:
 
 ---
 
-## 9. Open issues / next steps
+## 9. Eval results history
 
-In priority order:
+| run | n_ambig | n_clean | recall@high | recall@med | recall@low | fp@high | fp@med | fp@low | notes |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-05-20-220054 | 9 | 10 | 22% | 100% | 100% | 0.90 | 2.70 | 3.70 | First eval. 100% recall@low is "flag everything"; per-q mean 3.33 ambig / 3.70 clean — anti-discriminating. |
+| 2026-05-21-113655 | 14 | 5 | **50%** | 100% | 100% | **0.00** | 1.20 | 2.60 | Meta-stripper + relabeled 5 marginal clean → ambiguous. fp@high → 0 (perfect on strict-clean), recall@high up 28 pts, per-q mean 4.07 ambig / 2.60 clean (real discrimination). |
 
-1. **Strip resolver meta-notes from criteria text at eval-time.** Question 2750 has gold-label leakage: its criteria literally start with "Note: This question was resolved ambiguous because…" — the linter trivially flags scope_drift from reading that. ~10 lines of regex in `run_eval.py`. **(DOING NOW.)**
-2. **Tighten "clean" labels.** Six rows (6557, 1329, 2573, 900, 2934, 20005) have real defects (vague sources, missing deadlines, undefined verbs) that happened not to dispute. Relabel from `clean` to `ambiguous` with notes naming the defect. **(DOING NOW.)**
-3. **Re-run eval against cleaned data.** Get an honest baseline. **(DOING NOW.)**
-4. **Per-row "actual disputed issue" annotations on ambiguous rows.** Spec recall is "linter flags ≥1 of the *actual* disputed issues" — we currently measure "linter flags ≥1 of anything", a weaker proxy. Annotating which rubric item is the right answer per row would let us measure the spec criterion. ~30 min of human work for n=15.
-5. **Rubric tuning to raise high-severity recall.** Currently most ambiguous questions get medium-severity flags. The rubric's severity definitions could push the model to escalate when an issue is genuinely dispute-causing. Don't tune until #1-#3 are clean.
-6. **Topic diversity.** Current 19-question set is 12/19 disease/PHEIC. Need politics, economics, AI, climate, sports questions to test generalization. Add 5-10 more during next curation pass.
-7. **Phase 2 entry**: suggested-rewrite generation per finding. Extend `Finding` schema with `suggested_rewrite: str | None`; update system prompt; add blind-reviewer protocol for rewrite quality.
+**Phase 1 exit thresholds**: recall ≥70%, FP/clean ≤1.0. Current gap: recall@high 50% (need +20 pts), fp@medium 1.20 (need ≤1.0).
+
+The 7 ambiguous questions where the linter is lukewarm (medium findings, no high) are exactly the "subtle dispute" cases — annulled questions where the criteria looked OK but an edge case bit. The linter catches the issue but doesn't escalate severity. **This is the next tunable lever** (rubric severity definitions).
+
+The 5 clean questions all get 0 high-severity findings. The rubric's "high" threshold is working correctly.
 
 ---
 
-## 10. Recreation recipe (rebuild from zero)
+## 10. Open issues / next steps
+
+In priority order:
+
+1. ✅ **Strip resolver meta-notes from criteria text** — done in `run_eval.py`, tested.
+2. ✅ **Tighten clean labels** — done; 5 rows relabeled to ambiguous.
+3. ✅ **Re-run eval** — done; numbers in §9.
+4. **Rubric tuning to raise high-severity recall to 70%.** Currently 50%. The lukewarm-on-subtle-disputes pattern is the lever — the rubric's severity definitions should push the model to escalate when issue involves words like "credible sources", "approximately", "may", "if available", "best judgment". Don't touch rubric items themselves yet; tune the severity language in `schema.py` and the system prompt in `critic.py`.
+5. **Per-row "actual disputed issue" annotations on ambiguous rows.** Spec recall is "linter flags ≥1 of the *actual* disputed issues" — we measure "linter flags ≥1 of anything". ~30 min of human work for n=14. Would unlock measuring the spec's true criterion.
+6. **More truly-clean questions.** n=5 clean is too few for a stable FP measurement. Need ~10. Curate from politics/finance/sports questions with crisp criteria.
+7. **Topic diversity.** Set is 12/19 disease/PHEIC. Add 5-10 questions from other domains (geopolitics, AI capability benchmarks, market thresholds, climate records).
+8. **Phase 2 entry**: suggested-rewrite generation per finding. Extend `Finding` schema with `suggested_rewrite: str | None`; update system prompt; add blind-reviewer protocol.
+
+---
+
+## 11. Recreation recipe (rebuild from zero)
 
 If starting over on a new machine:
 
@@ -288,7 +305,7 @@ python -m scripts.run_eval --note "v0 baseline"
 
 ---
 
-## 11. Memory/preferences index (machine-wide)
+## 12. Memory/preferences index (machine-wide)
 
 These live in `~/.claude/projects/<project-id>/memory/` and persist across sessions:
 

@@ -24,6 +24,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -36,17 +37,51 @@ from sharper.critic import MAX_INPUT_CHARS, critique_question
 SEVERITY_ORDER = {"low": 1, "medium": 2, "high": 3}
 
 
+# Patterns that signal a resolver's after-the-fact meta-note inside the criteria
+# text. Any paragraph (split by blank lines) containing one of these gets dropped
+# at eval time -- otherwise the linter trivially "catches" scope_drift /
+# ambiguity by reading the resolver's own annulment note.
+_META_NOTE_PATTERNS = [
+    re.compile(r"Note:\s*This question (was|is)\s+(resolved|annulled)", re.IGNORECASE),
+    re.compile(r"^\s*EDIT[: ]+.*\b(resolved|annulled)\b", re.IGNORECASE | re.MULTILINE),
+    re.compile(r"^\s*This question (was |is )?(resolved|annulled)\s+(ambiguous|because)", re.IGNORECASE | re.MULTILINE),
+    # "title and resolution criteria/criterion ... clash/clashed" -- matches both
+    # 2750's "a clash was discovered between the title and resolution criteria"
+    # and 2793's "title and resolution criterion clashed".
+    re.compile(r"title and resolution criteri[oa]n[s]?.*\bclash", re.IGNORECASE | re.DOTALL),
+    re.compile(r"a clash was discovered between the title", re.IGNORECASE),
+]
+
+
+def strip_resolver_meta_notes(text: str | None) -> str | None:
+    """Drop paragraphs containing resolver after-the-fact meta-notes.
+
+    Operates paragraph-by-paragraph (paragraphs separated by blank lines).
+    Conservative: only matches very specific resolver-prefix shapes so we don't
+    accidentally strip legitimate context that mentions resolution mechanics.
+    """
+    if not text:
+        return text
+    paragraphs = re.split(r"\n\s*\n", text)
+    kept = [p for p in paragraphs if not any(pat.search(p) for pat in _META_NOTE_PATTERNS)]
+    return "\n\n".join(kept).strip() or None
+
+
 def build_question_text(row: dict[str, Any]) -> str:
     """Combine title + criteria + fine_print + background into one input string."""
     parts: list[str] = []
     if row.get("title"):
         parts.append(row["title"])
-    if row.get("resolution_criteria"):
-        parts.append(f"\nResolution Criteria:\n{row['resolution_criteria']}")
-    if row.get("fine_print"):
-        parts.append(f"\nFine Print:\n{row['fine_print']}")
-    if row.get("background"):
-        parts.append(f"\nBackground:\n{row['background']}")
+    # Strip resolver meta-notes from criteria + background before linting.
+    rc = strip_resolver_meta_notes(row.get("resolution_criteria"))
+    if rc:
+        parts.append(f"\nResolution Criteria:\n{rc}")
+    fp = strip_resolver_meta_notes(row.get("fine_print"))
+    if fp:
+        parts.append(f"\nFine Print:\n{fp}")
+    bg = strip_resolver_meta_notes(row.get("background"))
+    if bg:
+        parts.append(f"\nBackground:\n{bg}")
     return "\n".join(parts)
 
 

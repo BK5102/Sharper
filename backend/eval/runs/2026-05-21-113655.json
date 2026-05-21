@@ -1,0 +1,724 @@
+{
+  "timestamp": "2026-05-21-113655",
+  "input": "data\\questions.metaculus.jsonl",
+  "note": "v0.2: meta-note stripper added; relabeled 5 marginal-clean rows to ambiguous",
+  "skipped": [],
+  "summary": {
+    "n_total": 19,
+    "n_ambiguous": 14,
+    "n_clean": 5,
+    "recall": {
+      "low": {
+        "n_caught": 14,
+        "n_total": 14,
+        "fraction": 1.0
+      },
+      "medium": {
+        "n_caught": 14,
+        "n_total": 14,
+        "fraction": 1.0
+      },
+      "high": {
+        "n_caught": 7,
+        "n_total": 14,
+        "fraction": 0.5
+      }
+    },
+    "fp_per_clean": {
+      "low": {
+        "total_findings": 13,
+        "n_clean": 5,
+        "per_question": 2.6
+      },
+      "medium": {
+        "total_findings": 6,
+        "n_clean": 5,
+        "per_question": 1.2
+      },
+      "high": {
+        "total_findings": 0,
+        "n_clean": 5,
+        "per_question": 0.0
+      }
+    },
+    "rubric_firing": {
+      "ambiguous": {
+        "source_authority": 9,
+        "operationalization": 9,
+        "time_bound_specification": 10,
+        "edge_case_handling": 17,
+        "resolution_criteria_clarity": 7,
+        "scope_drift": 5
+      },
+      "clean": {
+        "source_authority": 5,
+        "edge_case_handling": 6,
+        "time_bound_specification": 1,
+        "operationalization": 1
+      }
+    }
+  },
+  "per_row": [
+    {
+      "id": "metaculus-41091",
+      "label": "clean",
+      "title": "Will the WHO declare a Public Health Emergency of International Concern in 2026?",
+      "n_input_chars": 613,
+      "findings": [
+        {
+          "rubric_item": "source_authority",
+          "severity": "low",
+          "quoted_span": "the World Health Organization (WHO) declares a new Public Health Emergency of International Concern (PHEIC)",
+          "issue": "No specific source or tracking mechanism is named for confirming a PHEIC declaration.",
+          "explanation": "While WHO is the declaring body, the question does not specify which WHO outlet or publication to use as the authoritative record (e.g., the WHO Director-General's official statement, the WHO website's PHEIC listings, or a press release). In practice this is unlikely to be disputed since WHO declarations are high-profile, but a clean question would point to a specific document or page to avoid any ambiguity about the moment of official declaration."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "low",
+          "quoted_span": "declares a new Public Health Emergency of International Concern (PHEIC)",
+          "issue": "The question is silent on whether a PHEIC declared and then immediately revoked within 2026 would still count as a qualifying declaration.",
+          "explanation": "If the WHO declares a PHEIC but revokes it within hours or days (e.g., due to a procedural error or rapid containment), it is unclear whether that would resolve Yes. The resolution criteria only require a declaration, not that it remain in force, which could be disputed if such an edge case occurs."
+        }
+      ],
+      "overall_assessment": "The question is generally well-written with a clear time bound, a defined concept of 'new,' and an explicit exclusion of ongoing PHEICs. Two minor issues exist: no named authoritative source document and silence on the case of a rapidly revoked declaration, but neither is likely to cause a serious dispute in practice."
+    },
+    {
+      "id": "metaculus-6557",
+      "label": "ambiguous",
+      "title": "Will there be at least 1,000 Ebola deaths in 2021?",
+      "n_input_chars": 432,
+      "findings": [
+        {
+          "rubric_item": "source_authority",
+          "severity": "high",
+          "quoted_span": "the WHO, or credible media reports",
+          "issue": "The resolution source is a disjunction of a named authority and an undefined category ('credible media reports'), leaving the arbiter unspecified.",
+          "explanation": "'Credible media reports' is not a specific, stable source — it could refer to any number of outlets and is inherently subjective. If WHO does not publish a single consolidated 2021 Ebola death figure but media sources report conflicting numbers, there is no objective way to determine which source governs resolution."
+        },
+        {
+          "rubric_item": "operationalization",
+          "severity": "medium",
+          "quoted_span": "died in 2021 due to Ebola infection",
+          "issue": "The phrase 'due to Ebola infection' is not operationalized — it is unclear whether this means laboratory-confirmed Ebola deaths only or also probable/suspected cases.",
+          "explanation": "WHO and outbreak reports typically distinguish confirmed, probable, and suspected cases, and the death counts differ significantly depending on which categories are included. Without specifying which classification counts, two reasonable interpreters using the same WHO data could arrive at different totals."
+        },
+        {
+          "rubric_item": "time_bound_specification",
+          "severity": "medium",
+          "quoted_span": "at least 1,000 persons have died in 2021 due to Ebola infection",
+          "issue": "The resolution criteria do not specify when in 2021 the count is assessed (e.g., deaths recorded by Dec 31, 2021, or deaths reported/confirmed by a later date).",
+          "explanation": "Ebola death counts are often revised for weeks or months after the reporting period ends. If a final consolidated WHO figure for 2021 is only published in early 2022, it is unclear whether the question resolves based on data available at end-of-year or after the final official tally is released."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "low",
+          "quoted_span": "deaths from all of them will count towards this question",
+          "issue": "The criteria do not address how to handle deaths in outbreaks that straddle the year boundary (e.g., an outbreak that began in late 2020 and continues into 2021).",
+          "explanation": "If a person is infected in 2020 but dies in 2021, it is unclear whether that death counts toward the 2021 total. Different WHO situation reports may attribute such deaths to the year of infection or the year of death, leading to ambiguity in the final count."
+        }
+      ],
+      "overall_assessment": "The question has one high-severity defect (reliance on 'credible media reports' as a co-equal resolution source), a medium-severity ambiguity around case classification, and minor gaps around year-boundary attribution and the exact timing of resolution. These issues should be fixed before publication."
+    },
+    {
+      "id": "metaculus-1329",
+      "label": "ambiguous",
+      "title": "Will the latest Ebola outbreak be stopped before it claims a hundred lives?",
+      "n_input_chars": 926,
+      "findings": [
+        {
+          "rubric_item": "source_authority",
+          "severity": "high",
+          "quoted_span": "Resolution is by credible media report.",
+          "issue": "'Credible media report' is not a specific, authoritative source for resolution.",
+          "explanation": "'Credible media report' does not identify a named outlet or organization, making it impossible to know which report would trigger resolution. Two resolvers could point to conflicting reports, or a media outlet could misreport the WHO declaration, leading to disputed resolution."
+        },
+        {
+          "rubric_item": "resolution_criteria_clarity",
+          "severity": "high",
+          "quoted_span": "before it claims 100 lives",
+          "issue": "'Claims 100 lives' is not operationalized — it is unclear which death count source is authoritative and whether the count is confirmed deaths, suspected deaths, or total reported deaths.",
+          "explanation": "Ebola outbreak death tolls are typically reported in multiple ways (confirmed, probable, suspected) by the WHO and local health authorities, and counts can differ significantly. Without specifying which count and which source, two resolvers could reach opposite conclusions about whether the 100-life threshold has been crossed."
+        },
+        {
+          "rubric_item": "resolution_criteria_clarity",
+          "severity": "medium",
+          "quoted_span": "Will this outbreak be declared over by the WHO before it claims 100 lives?",
+          "issue": "'Declared over by the WHO' lacks a definition of what constitutes an official WHO 'end of outbreak' declaration.",
+          "explanation": "The WHO may issue a formal 'end of Ebola outbreak' declaration, but it may also issue less formal statements or situation reports that indicate the outbreak has ended without a distinct formal declaration. It is unclear what specific WHO communication would satisfy this criterion."
+        },
+        {
+          "rubric_item": "time_bound_specification",
+          "severity": "medium",
+          "quoted_span": "Will the latest Ebola outbreak be stopped before it claims a hundred lives?",
+          "issue": "No explicit resolution deadline is stated for the case where the outbreak continues indefinitely or the WHO never formally declares it over.",
+          "explanation": "If the outbreak persists beyond the question's close date without a WHO declaration, the resolution mechanism is unclear. The question does not specify a calendar close date, leaving open the possibility that it never resolves No."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "before it claims 100 lives",
+          "issue": "The question is silent on what happens if the death toll crosses 100 before the WHO declares the outbreak over, but is then revised downward.",
+          "explanation": "Outbreak death tolls are sometimes revised as case investigations conclude; if a count temporarily exceeds 100 and is later reduced, it is ambiguous whether the question resolved Yes or No. Additionally, there is no guidance on what happens if the outbreak merges with a subsequent outbreak or is reclassified."
+        },
+        {
+          "rubric_item": "scope_drift",
+          "severity": "low",
+          "quoted_span": "Will the latest Ebola outbreak be stopped before it claims a hundred lives?",
+          "issue": "The title asks whether the outbreak will be 'stopped' but the resolution criteria ask whether it will be 'declared over by the WHO,' which are subtly different concepts.",
+          "explanation": "An outbreak could be functionally stopped (no new cases for weeks) before the WHO issues a formal declaration, or the WHO could declare it over by a procedural criterion that some forecasters might not equate with 'stopped.' This mismatch between title and criteria could cause disagreement about when to resolve."
+        }
+      ],
+      "overall_assessment": "The question has significant resolution ambiguity: it relies on an unspecified 'credible media report' rather than a named authoritative source, does not operationalize which death-count metric (confirmed vs. probable vs. suspected) applies, and lacks an explicit resolution deadline. These defects make disputed resolution likely."
+    },
+    {
+      "id": "metaculus-2793",
+      "label": "clean",
+      "title": "Will the current Ebola outbreak in the DRC be ongoing after February 2020?",
+      "n_input_chars": 984,
+      "findings": [
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "positive if it has not been declared over by the World Health Organisation by the end of the 29th of February 2020.",
+          "issue": "The question does not specify what counts as the WHO \"declaring\" the outbreak over — e.g., whether a formal end-of-outbreak declaration is required or whether a WHO statement that the outbreak is under control or transitioning would suffice.",
+          "explanation": "The WHO sometimes issues statements that reduce the outbreak's status (e.g., from 'Grade 3' to lower, or announces zero-case windows) without a formal end-of-outbreak declaration. If such intermediate statements are made by February 29, 2020, resolvers could disagree about whether the outbreak has been 'declared over.' A precise pointer to a specific WHO declaration type would eliminate this ambiguity."
+        },
+        {
+          "rubric_item": "source_authority",
+          "severity": "low",
+          "quoted_span": "declared over by the World Health Organisation",
+          "issue": "No specific WHO publication, database, or announcement channel is cited as the authoritative source for confirming the declaration.",
+          "explanation": "The WHO communicates outbreak status through multiple channels (disease outbreak news, press releases, situation reports). Without specifying which channel constitutes the official declaration, resolvers may disagree about which document to rely on. Naming a specific page or report type (e.g., the WHO Disease Outbreak News page) would make this unambiguous."
+        }
+      ],
+      "overall_assessment": "The question is mostly well-formed: it has a clear binary resolution, a precise date cutoff (February 29, 2020), and names the WHO as the resolution authority. Two modest issues remain — the exact form of a WHO 'declaration' is not specified, and no specific WHO channel is cited — but neither is likely to cause a major dispute in practice."
+    },
+    {
+      "id": "metaculus-10977",
+      "label": "clean",
+      "title": "Will WHO declare the spread of monkeypox a Public Health Emergency of International Concern before 2023?",
+      "n_input_chars": 658,
+      "findings": [
+        {
+          "rubric_item": "time_bound_specification",
+          "severity": "medium",
+          "quoted_span": "before 2023",
+          "issue": "'Before 2023' is ambiguous between 'before January 1, 2023' and 'before the end of calendar year 2023'.",
+          "explanation": "The phrase 'before 2023' is commonly interpreted as 'before January 1, 2023,' but some forecasters may read it as 'before December 31, 2023.' This ambiguity could cause a disputed resolution if a declaration occurs in early 2023. The question should specify an exact date such as 'before January 1, 2023, 00:00 UTC' to eliminate this ambiguity."
+        },
+        {
+          "rubric_item": "source_authority",
+          "severity": "low",
+          "quoted_span": "WHO declares that the spread of monkeypox constitutes a PHEIC",
+          "issue": "No specific WHO source or publication mechanism is named for confirming the declaration.",
+          "explanation": "While WHO PHEIC declarations are official and authoritative, the question does not specify which WHO outlet or document would serve as the resolution source (e.g., a press release on who.int, the Director-General's formal statement, or the IHR Emergency Committee report). In practice this is unlikely to be disputed since WHO declarations are prominent public events, but naming a source would fully close the gap."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "low",
+          "quoted_span": "It is unlikely but possible that monkeypox will fall under the WHO's smallpox categorization, which means there will not be a PHEIC declaration since smallpox is automatically considered a PHEIC and thus do not require an IHR decision to declare them as such. If this is the case, this question will resolve ambiguously.",
+          "issue": "The fine print creates a plausible ambiguous-resolution path without specifying what 'ambiguous' means for forecasters' scores.",
+          "explanation": "Resolving ambiguously on most platforms (e.g., Metaculus) annuls the question and returns forecasters to their prior, but this is not stated. If the smallpox-categorization edge case materializes, forecasters who predicted 'Yes' expecting credit for an effective PHEIC-level designation may dispute an ambiguous resolution. Clarifying exactly what 'resolve ambiguously' means (e.g., annulment, 50/50 split) would prevent this."
+        }
+      ],
+      "overall_assessment": "The question is largely well-specified with a clear resolution criterion and a thoughtful edge-case clause, but it has a medium-severity ambiguity in the time bound ('before 2023') and two low-severity gaps around source specification and the meaning of an ambiguous resolution."
+    },
+    {
+      "id": "metaculus-2750",
+      "label": "ambiguous",
+      "title": "Will the current DRC Ebola outbreak end by February 2020?",
+      "n_input_chars": 609,
+      "findings": [
+        {
+          "rubric_item": "resolution_criteria_clarity",
+          "severity": "high",
+          "quoted_span": "The replacement of this question can be found here.",
+          "issue": "The resolution criteria block opens with a redirect to another question rather than stating criteria, making the criteria depend on an external and potentially unavailable link.",
+          "explanation": "A reader relying solely on this question text cannot determine what resolves it without following the external link. If that link is broken or the referenced question changes, resolution becomes impossible without subjective judgment about what 'the replacement' intended."
+        },
+        {
+          "rubric_item": "scope_drift",
+          "severity": "medium",
+          "quoted_span": "Will the current DRC Ebola outbreak end by February 2020?",
+          "issue": "The title asks whether the outbreak will 'end by February 2020,' but the resolution criteria resolve on whether it is 'still ongoing by the 29th of February 2020,' inverting the Yes/No framing.",
+          "explanation": "A forecaster reading the title would expect a Yes resolution if the outbreak ends, but the criteria state the question resolves 'negative' (No) if it is declared over and 'positive' (Yes) otherwise — meaning Yes corresponds to the outbreak continuing, not ending. This inversion between title and criteria is likely to cause confusion and disputed interpretation of what forecasters were actually predicting."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "negative if it has been declared over by the World Health Organisation by the end of the 29th of February 2020.",
+          "issue": "The criteria do not address what happens if WHO declares the outbreak over and then it re-emerges before the resolution date, or if WHO issues a partial or conditional declaration.",
+          "explanation": "Ebola outbreaks have historically been declared over and then re-emerged; if WHO declares the outbreak over on, say, February 20th but a new case is confirmed before February 29th, it is unclear whether resolution is locked in at the declaration date or re-evaluated at the end of the period. This ambiguity could lead to a disputed resolution."
+        },
+        {
+          "rubric_item": "time_bound_specification",
+          "severity": "low",
+          "quoted_span": "by the end of the 29th of February 2020",
+          "issue": "'End of the 29th of February 2020' does not specify a timezone, leaving the precise cutoff ambiguous for a WHO declaration that might be issued near midnight.",
+          "explanation": "A WHO declaration issued at 11 PM UTC on February 29th would fall within the window in some timezones but outside it in others. While this is a minor edge case, a clean question would specify UTC or another reference timezone."
+        }
+      ],
+      "overall_assessment": "The question has a serious structural defect — the resolution criteria block redirects to an external link rather than standing alone — and an important scope-drift issue where the title's framing (outbreak ends = Yes) is inverted relative to the actual resolution logic (ongoing = positive/Yes). These should be corrected before the question is used for forecasting."
+    },
+    {
+      "id": "metaculus-20005",
+      "label": "clean",
+      "title": "Will Sam Altman and Greg Brockman start a new AI company, or join a competitor to OpenAI, before 2025?",
+      "n_input_chars": 918,
+      "findings": [
+        {
+          "rubric_item": "source_authority",
+          "severity": "medium",
+          "quoted_span": "Metaculus may make a determination if there is ambiguity regarding whether a company founded by or employing both individuals aims to train foundation models.",
+          "issue": "Resolution authority is delegated to Metaculus's discretionary judgment rather than a named, verifiable external source.",
+          "explanation": "Saying 'Metaculus may make a determination' means the resolution effectively becomes subjective editorial opinion rather than a checkable fact from a stable, authoritative source. Forecasters cannot independently verify the outcome without knowing in advance what evidence Metaculus would weigh, which is a hallmark of a source-authority defect."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "They must both be cofounders or employees at the same company.",
+          "issue": "The criteria are silent on what happens if one person (e.g., Brockman) joins or co-founds a company later than the other, or if one leaves before the deadline.",
+          "explanation": "If Altman joins a company in November 2024 and Brockman follows in February 2025, it is unclear whether the condition is ever satisfied before January 1, 2025. Similarly, if both briefly co-found a company but one departs before year-end, the instantaneous vs. sustained membership is unresolved, potentially leading to a disputed resolution."
+        },
+        {
+          "rubric_item": "operationalization",
+          "severity": "low",
+          "quoted_span": "aims to train foundation models",
+          "issue": "The word 'aims' is fuzzy — it is unclear whether a stated intent, a published research agenda, or actual training runs are required.",
+          "explanation": "A newly formed company could claim to aim at training foundation models without having done so or even having the resources to do so. The resolution criteria do not specify what evidence (press release, investor deck, published model, etc.) would be sufficient to establish this aim, leaving room for dispute."
+        }
+      ],
+      "overall_assessment": "The question is reasonably well-constructed with a clear time bound and a definition imported from the EU AI Act, but three moderate defects remain: resolution authority is delegated to Metaculus discretion rather than a named external source, the criteria are silent on timing/duration edge cases for joint membership, and 'aims to train foundation models' is not operationalized into verifiable evidence."
+    },
+    {
+      "id": "metaculus-2573",
+      "label": "ambiguous",
+      "title": "Will the current Ebola outbreak claim more than 1000 lives?",
+      "n_input_chars": 1100,
+      "findings": [
+        {
+          "rubric_item": "time_bound_specification",
+          "severity": "high",
+          "quoted_span": "Will this outbreak claim more than 1000 lives before it is declared over by the WHO?",
+          "issue": "The resolution deadline is tied to an open-ended event ('declared over by the WHO') rather than a fixed calendar date, meaning the question could remain open indefinitely if the outbreak is never formally declared over.",
+          "explanation": "Without a hard calendar cutoff, the question cannot resolve No if the outbreak persists for years but never officially ends. Forecasters have no fixed horizon against which to calibrate their predictions, and the platform cannot administratively close the question at a known date."
+        },
+        {
+          "rubric_item": "source_authority",
+          "severity": "high",
+          "quoted_span": "Resolution is by credible media report, or by the Congolese Government: https://us13.campaign-archive.com/home/?u=89e5755d2cca4840b1af93176&id=976e10809f",
+          "issue": "'Credible media report' is not a named, authoritative source, and the linked URL is a Mailchimp campaign-archive page whose availability and update schedule cannot be guaranteed.",
+          "explanation": "'Credible media report' introduces subjective judgment about which outlets qualify and could lead to disputes if different sources report different death tolls. The Mailchimp archive link may go stale or stop being updated, leaving no reliable source at resolution time. A specific, institutionally stable source (e.g., WHO situation reports or the DRC Ministry of Health dashboard) should be named instead."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "before it is declared over by the WHO",
+          "issue": "The question does not specify what happens if a different authority (e.g., the DRC government or PHEIC committee) declares the outbreak over while the WHO has not, or vice versa.",
+          "explanation": "If the DRC government declares the outbreak over before the WHO does, it is unclear which declaration triggers resolution. Conversely, if the WHO never issues a formal 'end of outbreak' declaration, the question's resolution condition may never be satisfied, creating a dispute about whether it should resolve No."
+        },
+        {
+          "rubric_item": "scope_drift",
+          "severity": "low",
+          "quoted_span": "Will the current Ebola outbreak claim more than 1000 lives?",
+          "issue": "The title asks about 'the current Ebola outbreak' without specifying a country, while the resolution criteria refer specifically to the DRC outbreak.",
+          "explanation": "A forecaster reading only the title cannot tell which outbreak is meant, as multiple Ebola outbreaks have occurred historically. The title and body agree implicitly, but the mismatch could cause confusion if another concurrent outbreak exists."
+        }
+      ],
+      "overall_assessment": "The question has two high-severity defects: no fixed calendar deadline (the open-ended 'declared over by the WHO' condition makes No resolution potentially impossible) and an underspecified source ('credible media report' plus an unstable Mailchimp link). These issues are likely to cause disputed resolutions and should be addressed before publication."
+    },
+    {
+      "id": "metaculus-900",
+      "label": "ambiguous",
+      "title": "Will the current Ebola outbreak be contained to under 50 cases?",
+      "n_input_chars": 627,
+      "findings": [
+        {
+          "rubric_item": "time_bound_specification",
+          "severity": "high",
+          "quoted_span": "Resolution will be based on WHO data when they declare the outbreak over.",
+          "issue": "No calendar deadline is specified; the question can only resolve Yes/No after WHO declares the outbreak over, but there is no cutoff date if WHO never makes such a declaration or if the outbreak drags on indefinitely.",
+          "explanation": "Without a fixed resolution date, the question cannot resolve No on any predetermined schedule. If the outbreak persists for years or WHO never formally declares it over, the question remains open-ended, which prevents timely resolution and frustrates forecasters."
+        },
+        {
+          "rubric_item": "resolution_criteria_clarity",
+          "severity": "high",
+          "quoted_span": "Will this outbreak be contained to less than 50 cases of Ebola?",
+          "issue": "'Contained' is undefined — it is unclear whether resolution requires WHO to declare the outbreak over with fewer than 50 cases, or simply whether the cumulative case count stays below 50 at any declared end point.",
+          "explanation": "A question about containment could resolve differently depending on whether 'contained' means the outbreak is declared over, active transmission has stopped, or the case count simply never reaches 50. These are meaningfully different criteria and a reader cannot determine resolution without a subjective judgment about what 'contained' means."
+        },
+        {
+          "rubric_item": "operationalization",
+          "severity": "medium",
+          "quoted_span": "less than 50 cases of Ebola",
+          "issue": "It is not specified whether the 50-case threshold refers to confirmed cases only, confirmed plus probable, or confirmed plus probable plus suspected cases.",
+          "explanation": "WHO outbreak reports distinguish between confirmed, probable, and suspected cases, and the totals differ substantially. The resolution criteria could produce different Yes/No outcomes depending on which category is used, as the question text already blends 'confirmed' and 'suspected' counts in the background without clarifying which count governs resolution."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "Resolution will be based on WHO data when they declare the outbreak over.",
+          "issue": "The question is silent on what happens if WHO never formally declares the outbreak over, or if it merges with a subsequent outbreak.",
+          "explanation": "If the outbreak is administratively merged with a subsequent DRC Ebola outbreak (as happened in 2018), there may be no standalone 'outbreak over' declaration, leaving the question unresolvable. A clean question would specify a fallback resolution mechanism or date."
+        }
+      ],
+      "overall_assessment": "The question has significant deficiencies: it lacks a calendar resolution deadline, leaves 'contained' undefined, and does not specify which WHO case classification (confirmed, probable, suspected) counts toward the 50-case threshold. These issues will very likely produce disputed resolutions."
+    },
+    {
+      "id": "metaculus-2934",
+      "label": "ambiguous",
+      "title": "Before 30 November 2019, will an Ebola health worker be injured or killed in an attack against an Ebola facility inside the Central African Republic, South Sudan, Uganda, Rwanda, Burundi, or Tanzania?",
+      "n_input_chars": 1034,
+      "findings": [
+        {
+          "rubric_item": "source_authority",
+          "severity": "high",
+          "quoted_span": "Economist, AlJazeera, Vox, France24",
+          "issue": "The sources cited in the background are media outlets listed parenthetically as context, but no specific authoritative source is designated for resolution.",
+          "explanation": "The question never names a source that will be used to confirm whether an attack occurred and injured or killed a health worker. Without a designated resolution source, adjudicators could disagree about whether a given report is credible enough, and forecasters cannot know what evidence will settle the question."
+        },
+        {
+          "rubric_item": "resolution_criteria_clarity",
+          "severity": "high",
+          "quoted_span": "will an Ebola health worker be injured or killed in an attack against an Ebola facility",
+          "issue": "The resolution criteria do not specify what evidence or reporting standard is required to confirm that an attack occurred and resulted in injury or death.",
+          "explanation": "The question body is repeated verbatim as the resolution criteria, providing no procedure for determining a Yes vs No outcome. A reader needs to know what level of confirmation—official government statement, WHO report, verified news story—is sufficient to resolve the question Yes."
+        },
+        {
+          "rubric_item": "operationalization",
+          "severity": "medium",
+          "quoted_span": "attack against an Ebola facility",
+          "issue": "'Attack against an Ebola facility' is not operationalized — it is unclear whether this includes vandalism, arson, armed assault, mob violence, or only targeted attacks.",
+          "explanation": "Different types of incidents could plausibly be characterized as an 'attack' or not, leading to disputed resolution. For example, a protest that damages property but does not directly target health workers might or might not qualify depending on how 'attack against an Ebola facility' is interpreted."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "injured or killed in an attack against an Ebola facility inside the Central African Republic, South Sudan, Uganda, Rwanda, Burundi, or Tanzania",
+          "issue": "The question is silent on whether the health worker must be working at the facility at the time of the attack, or whether a worker injured nearby or en route counts.",
+          "explanation": "If a health worker is injured in an attack adjacent to but not inside an Ebola facility, or is targeted outside the facility, it is unclear whether that resolves the question Yes. This ambiguity could produce a disputed resolution if such an event occurs."
+        },
+        {
+          "rubric_item": "time_bound_specification",
+          "severity": "low",
+          "quoted_span": "Before 30 November 2019",
+          "issue": "'Before 30 November 2019' does not clarify the exact timezone or time of day used as the cutoff.",
+          "explanation": "While this is a minor issue, 'before 30 November' could mean different moments depending on timezone (e.g., UTC vs. local time in the listed countries). For most forecasting purposes this is unlikely to matter, but a clean question would specify UTC or end-of-day."
+        }
+      ],
+      "overall_assessment": "The question has two high-severity defects: no resolution source is named, and the question body is restated in place of actual resolution criteria. These alone are likely to cause disputed resolutions. Two medium-severity issues around operationalization of 'attack' and edge cases regarding worker location add further ambiguity."
+    },
+    {
+      "id": "metaculus-42472",
+      "label": "clean",
+      "title": "Will the US and Iran agree to a ceasefire before May 2026?",
+      "n_input_chars": 701,
+      "findings": [
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "official bilateral ceasefire between the United States and Iran has gone into effect",
+          "issue": "The question does not define what constitutes an 'official' ceasefire — whether a signed document, a joint public statement, or a UN-registered agreement is required.",
+          "explanation": "'Official' is not operationalized: a jointly announced ceasefire communicated via press statements might be disputed as insufficient while a formally signed treaty would clearly qualify. Without specifying the form or mechanism by which the ceasefire must be made official, two reasonable interpreters could disagree on whether a particular agreement resolves Yes."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "applies to all kinetic fighting against the other by both sides",
+          "issue": "The question is silent on whether proxy forces or allied militias acting on behalf of either party count as 'both sides' for the purpose of the ceasefire.",
+          "explanation": "Iran frequently operates through proxies (e.g., Hezbollah, Houthi forces), and the US may conduct strikes through partners. If a ceasefire covers only direct state-on-state kinetic action but proxy hostilities continue, it is unclear whether the agreement 'applies to all kinetic fighting.' This ambiguity could easily lead to a disputed resolution."
+        },
+        {
+          "rubric_item": "source_authority",
+          "severity": "low",
+          "quoted_span": "official bilateral ceasefire between the United States and Iran has gone into effect",
+          "issue": "No specific authoritative source is named to verify that a ceasefire has gone into effect.",
+          "explanation": "The resolution criteria rely on the existence of an 'official' ceasefire but do not specify which source (e.g., official White House announcement, State Department statement, UN Security Council documentation) would be used to confirm it. Without a named source, resolvers must exercise subjective judgment about what counts as sufficient evidence."
+        }
+      ],
+      "overall_assessment": "The question is reasonably well-scoped and time-bound, with useful fine print excluding informal de-escalation. The main weaknesses are the undefined standard for what makes a ceasefire 'official,' the unresolved treatment of proxy forces, and the absence of a named authoritative source for resolution."
+    },
+    {
+      "id": "metaculus-25703",
+      "label": "ambiguous",
+      "title": "On Sept 15, 2024, will Nvidia's market capitalization be larger than Apple's?",
+      "n_input_chars": 1026,
+      "findings": [
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "If Companies Market Cap is unavailable or if there are reasonable concerns as to the accuracy of its data at resolution time, Metaculus may consider other credible sources to resolve this question.",
+          "issue": "The fallback to 'other credible sources' is undefined, leaving open which source would be authoritative if the primary source fails.",
+          "explanation": "If Companies Market Cap is unavailable, different 'credible sources' (e.g., Bloomberg, Yahoo Finance, Google Finance) can report slightly different market caps at the same moment due to share-count methodology differences. Without specifying which fallback source takes precedence, the resolution could be disputed if Nvidia and Apple are close in market cap at resolution time."
+        },
+        {
+          "rubric_item": "time_bound_specification",
+          "severity": "low",
+          "quoted_span": "approximately 4 PM EDT",
+          "issue": "The word 'approximately' introduces a small window of ambiguity around the exact resolution timestamp.",
+          "explanation": "Market caps can fluctuate meaningfully in the minutes around market close. If the two companies' caps are very close, the precise moment of the snapshot matters, and 'approximately 4 PM EDT' does not pin this down exactly. A cleaner specification would say 'at market close (4:00 PM EDT exactly)' or 'as reported by Companies Market Cap at 4:00 PM EDT.'"
+        }
+      ],
+      "overall_assessment": "The question is well-structured with a clear date, a named primary source, and an explicit comparison. Minor issues exist around the undefined fallback source and the slightly vague 'approximately 4 PM EDT' timestamp, but neither is likely to cause serious disputes unless the market caps are extremely close at resolution time."
+    },
+    {
+      "id": "metaculus-20127",
+      "label": "ambiguous",
+      "title": "Will any country score in the top tier overall in the next Global Health Security Index?",
+      "n_input_chars": 1795,
+      "findings": [
+        {
+          "rubric_item": "time_bound_specification",
+          "severity": "medium",
+          "quoted_span": "the next Global Health Security (GHS) Index report due in 2024 (or later)",
+          "issue": "The resolution deadline is vague — 'due in 2024 (or later)' does not specify a precise cutoff beyond the annulment date.",
+          "explanation": "While the annulment clause sets January 1, 2026 as the outer boundary, the phrase 'due in 2024 (or later)' creates ambiguity about when forecasters should expect resolution. The question does not specify whether resolution happens as soon as any report is published after a certain date, or only once a specific scheduled edition is released, which could create confusion if a supplemental or interim report is published."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "If the next report is not published before January 1, 2026 or the scoring system changes, this question will be annulled.",
+          "issue": "The question does not define what constitutes a 'scoring system change' sufficient to trigger annulment.",
+          "explanation": "If the GHS Index slightly revises its weighting methodology or adjusts tier boundaries while retaining an overall 0–100 score, it is unclear whether that counts as a 'scoring system change.' A marginal methodological update could be interpreted either way, leading to a disputed annulment decision."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "low",
+          "quoted_span": "the next GHS Index report",
+          "issue": "The question does not clarify which report counts as 'the next' if interim or partial reports are published before the full 2024 edition.",
+          "explanation": "If the GHS Index publishes a partial update or country-specific supplement before the full next report, it is unclear whether that triggers resolution. The criteria should specify that only a full multi-country GHS Index report qualifies."
+        }
+      ],
+      "overall_assessment": "The question is mostly well-specified with a clear numeric threshold (80.1) and an explicit annulment clause, but has moderate ambiguity around what constitutes a 'scoring system change' for annulment purposes and mild vagueness about the resolution timeline beyond the 2026 cutoff."
+    },
+    {
+      "id": "metaculus-25846",
+      "label": "ambiguous",
+      "title": "Will Israel invade Lebanon before October 1, 2024?",
+      "n_input_chars": 2103,
+      "findings": [
+        {
+          "rubric_item": "source_authority",
+          "severity": "medium",
+          "quoted_span": "reporting from credible sources indicates that the number of troops entering is more than 100",
+          "issue": "'Credible sources' is not a named, specific source — it is a vague class of sources that could be disputed.",
+          "explanation": "'Credible sources' gives no guidance on which outlets or official bodies qualify, making it possible for two resolvers to disagree on whether a given report meets the standard. A stable, authoritative named source (e.g., a specific government announcement body, UN official communiqué, or named wire services) is needed to remove subjectivity from this determination."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "either the Government of Israel or any two Permanent Members of the United Nations Security Council announce or acknowledge that Israeli ground troops have entered Lebanese territory",
+          "issue": "The criteria are silent on what happens if one side acknowledges the incursion but disputes its scale or characterization.",
+          "explanation": "If, for example, only one P5 member acknowledges an incursion and Israel denies it, or a P5 member's statement is ambiguous about whether it constitutes an 'acknowledgment,' it is unclear how the question resolves. The disjunctive acknowledgment standard ('Government of Israel OR any two P5 members') creates scenarios where conflicting official positions could be read both ways."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "the number of troops entering is more than 100",
+          "issue": "The criteria do not specify whether the 100-troop threshold applies to a single incursion event or cumulatively across multiple smaller incursions.",
+          "explanation": "Israel might conduct multiple small cross-border operations each involving fewer than 100 troops that together exceed 100. Without clarifying whether the threshold applies per-incident or in aggregate, reasonable interpreters could reach different resolutions."
+        },
+        {
+          "rubric_item": "operationalization",
+          "severity": "low",
+          "quoted_span": "troops are acting deliberately on orders of the Government of Israel and without permission of the currently recognized Government of Lebanon or the assent of the United Nations",
+          "issue": "'Assent of the United Nations' is not operationalized — it is unclear which UN body or official must provide assent and in what form.",
+          "explanation": "'Assent of the United Nations' could mean a Security Council resolution, a statement from the Secretary-General, or a UNIFIL authorization. Without specifying which body and what form of assent counts, this condition could be disputed in practice."
+        }
+      ],
+      "overall_assessment": "The question is reasonably well-structured with clear geography and time bounds, but has several medium-severity issues: the 'credible sources' standard is under-specified, the dual-acknowledgment logic creates edge cases, and the 100-troop threshold is ambiguous about whether it applies per-incident or cumulatively. These should be addressed to avoid disputed resolution."
+    },
+    {
+      "id": "metaculus-20171",
+      "label": "ambiguous",
+      "title": "Will Huada Empyrean be publicly traded in 2026?",
+      "n_input_chars": 3522,
+      "findings": [
+        {
+          "rubric_item": "time_bound_specification",
+          "severity": "medium",
+          "quoted_span": "listed on a public stock exchange on January 1st, 2026",
+          "issue": "Resolution is tied to a single calendar date (January 1, 2026) rather than a period, which may create practical problems since exchanges are typically closed on January 1 (a public holiday in most jurisdictions).",
+          "explanation": "If exchanges are closed on January 1, 2026, it is unclear whether the question resolves based on the listing status as of December 31, 2025, or the first trading day of 2026. This ambiguity could lead to disputed resolution if the company lists in late December 2025 or early January 2026."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "low",
+          "quoted_span": "If the company is acquired by another company or undergoes a merger with another company, the question will be annulled. (Note that this excludes special-purpose acquisition companies (SPACs)).",
+          "issue": "The SPAC exclusion is unclear — it is ambiguous whether a SPAC acquisition would resolve Yes (since a SPAC merger typically results in a public listing) or simply not trigger annulment.",
+          "explanation": "A SPAC merger is a common path to a public listing; stating only that it 'excludes SPACs' from the annulment condition without specifying whether a SPAC merger would resolve Yes or No creates a potential dispute. Forecasters might disagree on whether a SPAC-driven listing satisfies 'listed on a public stock exchange.'"
+        },
+        {
+          "rubric_item": "source_authority",
+          "severity": "low",
+          "quoted_span": "the name change can be confirmed via Wikipedia or credible news reports",
+          "issue": "'Credible news reports' is not a specific, authoritative source for confirming a corporate name change.",
+          "explanation": "Without naming specific outlets or a regulatory filing database (e.g., CSRC, SEC EDGAR, HKEX filings), different resolvers might reach different conclusions about whether a given news source qualifies as 'credible.' This could cause a disputed resolution in the edge case of a name change."
+        }
+      ],
+      "overall_assessment": "The question is generally well-constructed with clear resolution criteria, explicit source lists, and thoughtful edge-case handling. The main concern is the practical ambiguity of resolving on January 1 (a non-trading day), with minor issues around the SPAC carve-out and the vague 'credible news reports' standard for name changes."
+    },
+    {
+      "id": "metaculus-25701",
+      "label": "ambiguous",
+      "title": "Will OpenAI publish information describing Q* (Q-Star) by Sept 30, 2024?",
+      "n_input_chars": 3223,
+      "findings": [
+        {
+          "rubric_item": "operationalization",
+          "severity": "medium",
+          "quoted_span": "provides some information about what Q* is (for example, giving an overview of how Q* works without delving into technical detail)",
+          "issue": "The threshold for what constitutes sufficient 'information about what Q* is' is not operationalized, leaving room for dispute over whether a minimal acknowledgment qualifies.",
+          "explanation": "'Some information' and 'an overview of how Q* works without delving into technical detail' are subjective thresholds. A resolver could reasonably disagree about whether a one-sentence description or a vague characterization meets this bar versus a more substantive description, making resolution potentially disputed."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "public acknowledgement that the system or method described is Q* does not need to be made in the initial document describing the system or method, and can occur at a later time, including from public statements by OpenAI staff, including interviews, media appearances, or podcasts (this does not include statements made anonymously or on background)",
+          "issue": "The question is silent on what happens if the acknowledgment and the description are each published before Sept 30, 2024, but only combined/linked after that date.",
+          "explanation": "The criteria require both a published description and a public acknowledgment, but does not specify whether both conditions must be independently satisfied before the deadline or whether the linkage between them must also be established before Sept 30, 2024. This could lead to disputes if one element is clearly pre-deadline but the connecting acknowledgment arrives on or right at the boundary."
+        },
+        {
+          "rubric_item": "source_authority",
+          "severity": "medium",
+          "quoted_span": "public statements by OpenAI staff, including interviews, media appearances, or podcasts",
+          "issue": "No specific authoritative source is named to verify qualifying public statements by OpenAI staff, leaving resolution dependent on unspecified media or podcast coverage.",
+          "explanation": "Without naming a specific outlet or source that would be used to confirm such statements, resolvers must exercise judgment about which interviews, media appearances, or podcasts are credible and complete. This creates ambiguity about who decides what counts as a qualifying public statement."
+        },
+        {
+          "rubric_item": "operationalization",
+          "severity": "low",
+          "quoted_span": "a document (e.g., a blog post, paper, or video, but not a tweet)",
+          "issue": "The exclusion of tweets but inclusion of 'video' and 'blog post' leaves ambiguous whether a short social media video or a brief LinkedIn post would qualify.",
+          "explanation": "The criteria exclude tweets specifically but do not clarify whether other short-form social media content (e.g., a 30-second Instagram video or a LinkedIn update) counts as a qualifying document, which could cause disputes at the margins."
+        }
+      ],
+      "overall_assessment": "The question is generally well-drafted with thoughtful fine print, but has medium-severity ambiguity around what constitutes sufficient descriptive content ('some information'), how the two-part acknowledgment-plus-description condition interacts with the deadline, and the lack of a named authoritative source for qualifying public statements."
+    },
+    {
+      "id": "metaculus-13638",
+      "label": "ambiguous",
+      "title": "Will Poland and Ukraine settle the Przewodów incident before 2024?",
+      "n_input_chars": 2687,
+      "findings": [
+        {
+          "rubric_item": "operationalization",
+          "severity": "medium",
+          "quoted_span": "the Polish state has published formal inter-state diplomatic correspondence in which it affirms, or Andrzej Duda or his successor has made an announced official statement which affirms, that Poland has no outstanding unsettled claims or disputes with Ukraine arising from the Przewodów incident which require state-level action",
+          "issue": "The phrase 'no outstanding unsettled claims or disputes … which require state-level action' is not operationalized — there is no measurable threshold or authoritative checklist for what counts as 'settled' versus merely de-escalated or deprioritized.",
+          "explanation": "Two forecasters could disagree on whether a low-key statement expressing satisfaction with Ukraine's cooperation counts as affirming no outstanding claims, versus a formal bilateral agreement closing the file. 'Require state-level action' introduces subjective judgment about which residual issues are significant enough to demand government-level follow-up, making resolution potentially disputed."
+        },
+        {
+          "rubric_item": "source_authority",
+          "severity": "medium",
+          "quoted_span": "the Polish state has published formal inter-state diplomatic correspondence … or Andrzej Duda or his successor has made an announced official statement",
+          "issue": "No specific source or publication venue is named for verifying the diplomatic correspondence or official statement.",
+          "explanation": "'Formal inter-state diplomatic correspondence' is not necessarily publicly released, and 'announced official statement' could appear in many outlets or channels. Without naming a specific authoritative registry (e.g., the Polish Ministry of Foreign Affairs official website, the Presidential Chancellery press releases), resolvers must exercise judgment about which communications qualify, risking dispute."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "Claims arising from the incident which have been referred via a legal process or mutual diplomatic agreement to a court, arbitration body, or committee to decide their final disposition do not count as requiring further state-level action",
+          "issue": "The question is silent on what happens if Poland issues a statement affirming no current claims but later reopens the matter before the resolution date, or if Ukraine's acknowledgment (or lack thereof) is a prerequisite that goes unaddressed.",
+          "explanation": "The resolution criteria focus entirely on what Poland affirms, but never address whether Ukraine's conduct or acknowledgment plays any role. A scenario where Poland issues a closing statement while Ukraine still disputes the facts could be seen as 'settled' under the criteria by some resolvers and 'not genuinely settled' by others. Additionally, there is no handling of a Polish statement that is ambiguous or only partially addresses outstanding claims."
+        },
+        {
+          "rubric_item": "scope_drift",
+          "severity": "low",
+          "quoted_span": "Will Poland and Ukraine settle the Przewodów incident before 2024?",
+          "issue": "The title implies a bilateral settlement between both countries, but the resolution criteria measure only a unilateral Polish declaration of no outstanding claims.",
+          "explanation": "A forecaster reading the title would expect the question to resolve on a mutual agreement between Poland and Ukraine, but the criteria can be satisfied by Poland alone issuing a statement regardless of Ukraine's position. This mismatch could mislead forecasters about the nature of the event they are predicting."
+        }
+      ],
+      "overall_assessment": "The question has a reasonably clear time bound and a detailed resolution framework, but it contains meaningful ambiguity around what constitutes 'settled' at the state level, lacks a named authoritative source for the required statement, and has a scope mismatch between the bilateral framing of the title and the unilateral Polish-statement standard in the criteria. These defects are fixable but could generate resolution disputes."
+    },
+    {
+      "id": "metaculus-25877",
+      "label": "ambiguous",
+      "title": "Will exactly 3 Starship launches reach reach an altitude of 160 kilometers by Sept 30, 2024?",
+      "n_input_chars": 2127,
+      "findings": [
+        {
+          "rubric_item": "resolution_criteria_clarity",
+          "severity": "high",
+          "quoted_span": "This question will resolve as the number of SpaceX Starship launches that reach an altitude of at least 160 kilometers",
+          "issue": "The resolution criteria describe a numeric count, but the question title asks for a binary Yes/No resolution on whether exactly 3 launches reach that altitude, creating a fundamental mismatch in resolution type.",
+          "explanation": "The title frames this as a Yes/No question ('Will exactly 3 … reach …'), but the resolution criteria say the question 'will resolve as the number of … launches,' implying a numeric resolution. A forecaster cannot determine whether to predict a probability of Yes/No or a numeric count, and the resolver cannot know whether to return a count or a binary outcome."
+        },
+        {
+          "rubric_item": "scope_drift",
+          "severity": "high",
+          "quoted_span": "Will exactly 3 Starship launches reach reach an altitude of 160 kilometers by Sept 30, 2024?\n\nResolution Criteria:\nThis question will resolve as the number of SpaceX Starship launches",
+          "issue": "The title asks whether exactly 3 launches qualify, but the resolution criteria define resolution as the total count of qualifying launches, not as a Yes/No check against the number 3.",
+          "explanation": "A forecaster reading the title would think they are predicting a binary outcome tied to the specific count of 3, while the resolution criteria resolve to an open numeric value. These are different questions and would produce different resolution outcomes in most scenarios."
+        },
+        {
+          "rubric_item": "operationalization",
+          "severity": "medium",
+          "quoted_span": "substantially intact",
+          "issue": "'Substantially intact' is not operationalized into a measurable standard for determining whether a partial failure counts.",
+          "explanation": "The fine print conditions a qualifying launch on the vehicle reaching 160 km 'substantially intact,' but no threshold is provided — e.g., main structural components intact, engines still firing, or a percentage of mass retained. Different interpreters could reach different conclusions for a vehicle that loses one engine, sheds tiles, or breaks into two large pieces before reaching altitude."
+        },
+        {
+          "rubric_item": "source_authority",
+          "severity": "medium",
+          "quoted_span": "may also consider data or reporting from aerospace monitoring organizations or authorities, as well as other credible sources such as international media outlets",
+          "issue": "The resolution source list is open-ended and includes unspecified 'credible sources such as international media outlets,' which is not a stable authoritative source.",
+          "explanation": "Allowing resolution based on unspecified media outlets or unnamed aerospace monitoring organizations means different resolvers could reach different conclusions depending on which sources they choose. A specific authoritative source (e.g., SpaceX's official mission summary pages or FAA launch license records) should be the named primary source."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "On March 14, 2024, SpaceX's Integrated Test Flight 3 (IFT-3) saw Starship 28 briefly reach low-Earth orbit by achieving an altitude of 234 km before breaking up in the atmosphere upon re-entry.",
+          "issue": "The question is silent on whether IFT-3, which already occurred before the question was presumably written, counts toward the 3-launch total.",
+          "explanation": "IFT-3 reached 234 km (above the 160 km threshold) before the question's resolution deadline of Sept 30, 2024. If IFT-3 counts, the question is already partway resolved, but the criteria never state whether only future launches count or all launches up to the deadline. This ambiguity could cause a dispute at resolution."
+        },
+        {
+          "rubric_item": "time_bound_specification",
+          "severity": "low",
+          "quoted_span": "by Sept 30, 2024",
+          "issue": "'By Sept 30, 2024' does not specify whether the cutoff is the end of that calendar day in a particular timezone.",
+          "explanation": "Although Sept 30 is a clear date, the absence of a timezone means a launch that occurs late on Sept 30 in one timezone but crosses into Oct 1 UTC could be disputed. A clean question would specify e.g. 'before 23:59 UTC on Sept 30, 2024.'"
+        }
+      ],
+      "overall_assessment": "The question has a critical structural defect: the title asks a binary Yes/No question about exactly 3 launches, but the resolution criteria define resolution as a numeric count, making the resolution type undefined. Several additional medium-severity issues — around 'substantially intact,' open-ended sources, and whether IFT-3 already counts — would likely cause disputes. The question needs significant revision before it is ready for forecasting."
+    },
+    {
+      "id": "metaculus-14460",
+      "label": "ambiguous",
+      "title": "Will Russian troops reach the center of Bakhmut, Ukraine before 0000 hrs local time on January 20th, 2023?",
+      "n_input_chars": 3452,
+      "findings": [
+        {
+          "rubric_item": "operationalization",
+          "severity": "medium",
+          "quoted_span": "Resolution time will be the best estimate of when, exactly, the Russian troops entered, not the time of the subsequent report. Admins will use their best considered judgment of reliable sources to determine this.",
+          "issue": "'Best estimate' and 'best considered judgment' are subjective standards for backdating the actual entry time, which could be disputed when sources disagree.",
+          "explanation": "Because the resolution depends on whether troops entered before midnight on January 20th, backdating entry time using admin judgment rather than a defined methodology introduces subjectivity. Two sources could report the same event with different timestamps, and no rule specifies how to reconcile them, making the determination potentially contested."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "reported by at least two of the following specified sources to have reached the zone defined as the center of Bakhmut",
+          "issue": "The question is silent on what happens if sources report troops as reaching the area but later retract or correct that report.",
+          "explanation": "In fluid conflict reporting, initial reports of troop positions are frequently revised or retracted. The criteria do not specify whether a subsequent retraction by one or both sources would reverse a Yes resolution or whether the initial report locks in the outcome, creating a plausible dispute scenario."
+        },
+        {
+          "rubric_item": "edge_case_handling",
+          "severity": "medium",
+          "quoted_span": "Russian troops who are not prisoners, defectors, surrendering, bailed-out, etc",
+          "issue": "The exclusion category 'bailed-out' is undefined and the list uses 'etc,' leaving unclear what other troop statuses would be excluded.",
+          "explanation": "The term 'bailed-out' has no standard military meaning and 'etc' opens the door to disagreement about which other statuses disqualify troops. If Russian troops reach the center under ambiguous circumstances (e.g., a small infiltration unit later killed or captured), resolvers could dispute whether they were 'bailed-out' or otherwise excluded under the 'etc' catch-all."
+        },
+        {
+          "rubric_item": "resolution_criteria_clarity",
+          "severity": "low",
+          "quoted_span": "the eastern bank of the Bakhmutovka river",
+          "issue": "'Reached the eastern bank' is ambiguous about whether troops must cross onto the bank or merely reach the river's edge from the east.",
+          "explanation": "The criteria first define the center as everything west of the eastern bank, then say troops must 'reach the eastern bank.' It is unclear whether setting foot on the eastern bank itself satisfies the condition or whether troops must cross it and enter the western portion, which could produce disagreement at the margin."
+        }
+      ],
+      "overall_assessment": "The question is well-structured with a clearly enumerated source list, a defined geographic boundary, and explicit time bounds, but it carries moderate risk of disputed resolution due to subjective backdating of entry time, ambiguity around source retractions, and undefined exclusion categories like 'bailed-out' and 'etc.'"
+    }
+  ]
+}
