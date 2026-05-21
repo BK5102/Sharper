@@ -76,7 +76,7 @@ Sharper/
 ├── PROMPT.md                      # this file
 ├── .gitignore                     # Python + Node + .env + .tmp + eval/scratch
 └── backend/
-    ├── pyproject.toml             # deps: anthropic, pydantic, typer, rich, python-dotenv; dev: pytest, ruff
+    ├── pyproject.toml             # deps: anthropic, pydantic, typer, rich, python-dotenv, fastapi, uvicorn; dev: pytest, ruff, httpx
     ├── README.md                  # backend setup + held-out data workflow + data limitations
     ├── .env.example               # ANTHROPIC_API_KEY, SHARPER_MODEL, METACULUS_API_TOKEN
     ├── sharper/                   # main package (installed editable as `sharper`)
@@ -84,14 +84,17 @@ Sharper/
     │   ├── schema.py              # Pydantic Finding + Critique models
     │   ├── rubric.py              # 6 rubric items as frozen dataclass tuple
     │   ├── critic.py              # critique_question() via client.messages.parse(output_format=Critique)
-    │   └── cli.py                 # `sharper lint` Typer entry point
+    │   ├── cli.py                 # `sharper lint` Typer entry point
+    │   └── api.py                 # FastAPI app with POST /api/lint + GET /api/health; `sharper-api` script
     ├── scripts/
     │   ├── __init__.py
     │   ├── fetch_metaculus.py     # per-question detail-endpoint fetcher
     │   └── run_eval.py            # eval harness: recall + FP/clean at three severity cuts
     ├── tests/
     │   ├── test_smoke.py          # rubric integrity, prompt assembly, schema round-trip
-    │   └── test_fetch_metaculus.py
+    │   ├── test_fetch_metaculus.py
+    │   ├── test_run_eval.py       # meta-note stripper, build_question_text, summarize
+    │   └── test_api.py            # FastAPI endpoint contract (TestClient + mock)
     ├── data/
     │   ├── ids.example.txt        # placeholder URL list
     │   ├── ids.txt                # user-curated URLs (5 initial + 8 ambiguous + 6 more = 19)
@@ -140,6 +143,10 @@ Uses `client.messages.parse()` with `output_format=Critique` for typed structure
 ### CLI (`sharper/cli.py`)
 
 `sharper lint --text "..."` / `--file foo.jsonl --line N` / stdin. JSON output by default; `--pretty` renders a Rich table.
+
+### FastAPI wrapper (`sharper/api.py`)
+
+`POST /api/lint` body `{question: str}` → returns the `Critique` JSON shape. `GET /api/health` for liveness. CORS allows `http://localhost:3000` for future Next.js dev. Run with `sharper-api` (console script) or `uvicorn sharper.api:app --reload`. No auth or rate limiting yet — those land in follow-ups (Clerk + Upstash Redis).
 
 **Important detail**: `load_dotenv(override=True)` — the user's shell has `ANTHROPIC_API_KEY` exported as an empty string (from a stale `.bashrc` line), and python-dotenv's default doesn't override pre-existing env vars. The `override=True` flag makes `.env` the canonical source. Same fix is applied in `scripts/fetch_metaculus.py`.
 
@@ -198,17 +205,21 @@ This took the most iteration. The summary:
 **Built and working:**
 - ✅ Backend scaffold (`pyproject.toml`, `sharper/` package, tests)
 - ✅ Six-item rubric with definitions + example failures
-- ✅ Pydantic Finding + Critique schemas
+- ✅ Pydantic Finding + Critique schemas — Finding includes `suggested_rewrite: str | None`
 - ✅ Anthropic API call via `client.messages.parse(output_format=Critique)` with prompt caching
 - ✅ Typer CLI: stdin / `--text` / `--file` / `--line` / `--pretty`
+- ✅ **FastAPI wrapper** (`sharper/api.py`): `POST /api/lint`, `GET /api/health`, CORS, `sharper-api` console script
 - ✅ Metaculus per-ID fetcher with URL/ID list input + UTF-8 stdout
 - ✅ Claude-in-Chrome scraper prompt + JS extractor for full criteria text
 - ✅ Eval harness with three-severity recall + FP metrics, dated run JSON history
-- ✅ **Resolver-meta-note stripper** in `run_eval.py` (drops paragraphs with "Note: This question was resolved ambiguous", "title and resolution criteria clash", etc.) — prevents gold-label leakage in question 2750-style cases
-- ✅ 19-question labeled held-out set (**14 ambiguous + 5 clean** after relabeling 5 marginal rows)
-- ✅ Two eval runs committed
+- ✅ Resolver-meta-note stripper in `run_eval.py` — prevents gold-label leakage
+- ✅ Severity calibration tuned to escalate on discretionary language
+- ✅ 19-question labeled held-out set (14 ambiguous + 5 clean)
+- ✅ Four eval runs committed
 
-**Phase 1 status**: pipeline producing real discrimination now. See §9 for current numbers.
+**Phase 1 status**: **EXIT MET** at high severity (recall@high 79% vs 70% target; fp@high 0.40 vs 1.0 target).
+**Phase 2 status**: rewrites integrated into the linter; blind-reviewer protocol still TODO.
+**Phase 3 status**: FastAPI shipped; auth/rate-limit/frontend/Supabase still TODO.
 
 **Not yet built:**
 - Phase 2: suggested rewrites, eval harness with per-row "actual disputed issue" annotations, blind reviewer protocol
@@ -243,23 +254,25 @@ In priority order:
 4. ✅ **Severity calibration** — done; escalate on discretionary language / fuzzy central decision vars / missing hard deadlines / non-persistent sources. Recall@high jumped 50→79%, exceeds spec target.
 5. ✅ **Phase 1 exit met** — at high severity. Lock rubric v0.3 and move on.
 
-**Phase 2 entry (next):**
+**Phase 2:**
 
-6. **Add `suggested_rewrite: str | None` to the `Finding` schema.** Update system prompt to ask for a concrete alternative phrasing per finding that preserves authorial intent. ~30 lines of code + 1-2 prompt iterations.
-7. **Add `suggested_rewrite` to the JSONL eval format** so the eval harness can write per-row rewrites alongside findings.
-8. **Blind-reviewer protocol**: a small script that presents (original, rewrite) pairs and records "rewrite is meaningfully better" yes/no. Target Phase 2 success: ≥70% prefer rewrite on a 50-question set.
+6. ✅ **Added `suggested_rewrite: str | None` to the `Finding` schema.** System prompt updated. Eval run 2026-05-21-121442 shows rewrites are concrete and preserve intent.
+7. **Blind-reviewer protocol**: a small script that presents (original, rewrite) pairs and records "rewrite is meaningfully better" yes/no. Phase 2 success criterion: ≥70% prefer rewrite on a 50-question set. **Pending: depends on having reference rewrites annotated against ~50 questions.**
 
-**Held-out data work (parallel track for Phase 2):**
+**Held-out data work (parallel track):**
 
-9. **Per-row "actual disputed issue" annotations on ambiguous rows.** Spec recall is "linter flags ≥1 of the *actual* disputed issues"; we currently measure "≥1 of anything". ~30 min of human work for n=14. Unlocks the spec's true criterion.
-10. **Grow clean set to n=10** with politics / finance / sports / climate questions to stabilize FP measurement.
-11. **Grow ambiguous set to n=30+** across diverse topics. Combined eval set target: ~50 (Phase 2 spec).
+8. **Per-row "actual disputed issue" annotations on ambiguous rows.** Spec recall is "linter flags ≥1 of the *actual* disputed issues"; we currently measure "≥1 of anything". ~30 min of human work for n=14. Unlocks the spec's true criterion.
+9. **Grow clean set to n=10** with politics / finance / sports / climate questions to stabilize FP measurement.
+10. **Grow ambiguous set to n=30+** across diverse topics. Combined eval set target: ~50 (Phase 2 spec).
 
-**Phase 3 prep:**
+**Phase 3:**
 
-12. FastAPI wrapper around `critique_question()`. Per-IP rate limit, ~4000-char input cap.
-13. Next.js 14 + TipTap editor with inline span highlighting + click-to-accept rewrites.
-14. Clerk auth + Supabase Postgres for per-user history.
+11. ✅ **FastAPI wrapper around `critique_question()`** — `POST /api/lint`, `GET /api/health`, CORS for `localhost:3000`. No auth/rate-limit yet.
+12. **Per-user / per-IP rate limiting** via Upstash Redis. Requires Upstash account (user setup). 10 req/hr anonymous + per-user quota when authenticated.
+13. **Clerk auth integration**. Verify Clerk JWT on every protected request; extract `user_id` for rate limit + history scoping. Requires Clerk account (user setup).
+14. **Supabase Postgres** for per-user history (critiques + which rewrites were accepted). Requires Supabase account (user setup).
+15. **Next.js 14 + TipTap editor** with inline span highlighting + click-to-accept rewrites. Substantial frontend work.
+16. **History page** + landing-page example gallery (3-4 before/after examples).
 
 ---
 
