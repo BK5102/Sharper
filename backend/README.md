@@ -52,10 +52,30 @@ Current state of the labeled held-out set (`data/questions.metaculus.jsonl`): **
 
 ### Why we paused at n=19
 
-1. **Curation cost is non-trivial.** 3-5 minutes per ambiguous question to find on Metaculus, open in a tab, extract via Claude-in-Chrome, review, and label. Pushing to n=50 is ~2-4 hours of focused work.
-2. **Phase 1 exit bar was hit cleanly at n=19.** Adding more biosecurity-heavy questions would not have changed the recall + FP decision to ship Phase 1.
-3. **Topic concentration matters more than count.** 12 of 19 are disease/PHEIC questions. The next chunk needs to be diverse, not just bigger — politics, finance, climate, sports, AI capability — to test whether the linter generalizes.
-4. **Phase 2 evaluation is the actual reason to scale.** The blind-reviewer protocol (see §"Bringing Phase 2 from scaffolded to final") needs to exist first; building it against n=19 shakes out the protocol before paying the curation cost on the next 30 questions.
+**Structural constraints (independent of effort):**
+
+1. **The Metaculus public API doesn't expose resolution criteria reliably.** `GET /api2/questions/{id}/` returns question metadata but its `resolution_criteria`, `background`, and `fine_print` fields come back **empty for most questions** — that text exists only in the rendered web page HTML. The `/api2/questions/` *list* endpoint is also too limited to find resolved questions: `status=resolved` returns 400 ("not a valid choice"), `status=closed` returns ~300 recent unresolved bot-benchmark questions, and most `order_by` / filter params are silently ignored. We can't get bulk resolved-question text out of the API.
+
+2. **The public website is Cloudflare-protected.** Direct HTTP scraping (via `requests`, `httpx`, `WebFetch`, etc.) returns **403 Forbidden** to non-browser user agents. We can't simply hit the public question URLs and parse the HTML.
+
+3. **The workaround works but is one-tab-at-a-time.** We open each candidate question as a Chrome tab and run a Claude-in-Chrome session with a JS extractor that reads the rendered DOM. The extractor is scripted but the surrounding browser session is manual.
+
+**Cost of the workaround (per question, focused human time):**
+
+| Step | Time | What it involves |
+|---|---|---|
+| Curation | ~1-2 min | Browse metaculus.com Resolved + Binary; spot Annulled/Ambiguous resolution badges; open candidate URL as a tab |
+| Extraction | ~30 sec | Wait for Claude-in-Chrome batch to run across all open tabs (mostly automated; user just kicks it off) |
+| Labeling | ~2-3 min | Per row, set `label` (auto-set for Annulled/Ambiguous; manual for Yes/No-resolved) and write a one-liner `notes` |
+| **Total** | **~3-5 min** | Per question of focused work |
+
+Scaling **n=19 → n=50** is ~**1.5-2.5 hours** of focused work. Real but not unrealistic; intentionally deferred until Phase 2 needed the larger sample.
+
+**Strategic reasons we paused even before the cost barrier:**
+
+4. **Phase 1 exit bar was hit cleanly at n=19.** Adding more biosecurity-heavy questions would not have changed the recall + FP decision to ship Phase 1.
+5. **Topic concentration matters more than count.** 12 of 19 are disease/PHEIC questions. The next chunk needs to be diverse — politics, finance, climate, sports, AI capability — not just bigger.
+6. **Phase 2 evaluation needed the protocol to exist first.** The blind-reviewer protocol (see §"Bringing Phase 2 from scaffolded to final") had to be built and shaken out before we paid the curation cost on 30 more questions. That's done now (94% rewrite-better at n=19), so the next growth round is unblocked.
 
 ### Future-scope growth milestones
 
