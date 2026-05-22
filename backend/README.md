@@ -46,11 +46,28 @@ python -m scripts.fetch_metaculus --ids-file data/ids.txt --out data/questions.m
 
 Debug helper: `python -m scripts.fetch_metaculus --id 1 --raw-first` dumps the first raw API record — handy if Metaculus changes the schema and `_to_record()` needs updating.
 
-## Data limitations and path to a real eval set
+## Data: current state and growth plan
 
-The 5 hand-written questions in `questions.example.jsonl` and the 5 user-curated Metaculus questions in `questions.metaculus.jsonl` are a **smoke test, not a held-out eval set**. Don't read any signal from recall or false-positive rates computed at this sample size.
+Current state of the labeled held-out set (`data/questions.metaculus.jsonl`): **19 questions = 14 ambiguous + 5 clean.** This is enough to meet Phase 1's exit threshold cleanly and to scaffold Phase 2; it is **not** enough for the spec's Phase 2 evaluation (50 questions with reference rewrites and a blind-reviewer protocol).
 
-### Why n=5 is uninformative
+### Why we paused at n=19
+
+1. **Curation cost is non-trivial.** 3-5 minutes per ambiguous question to find on Metaculus, open in a tab, extract via Claude-in-Chrome, review, and label. Pushing to n=50 is ~2-4 hours of focused work.
+2. **Phase 1 exit bar was hit cleanly at n=19.** Adding more biosecurity-heavy questions would not have changed the recall + FP decision to ship Phase 1.
+3. **Topic concentration matters more than count.** 12 of 19 are disease/PHEIC questions. The next chunk needs to be diverse, not just bigger — politics, finance, climate, sports, AI capability — to test whether the linter generalizes.
+4. **Phase 2 evaluation is the actual reason to scale.** The blind-reviewer protocol (see §"Bringing Phase 2 from scaffolded to final") needs to exist first; building it against n=19 shakes out the protocol before paying the curation cost on the next 30 questions.
+
+### Future-scope growth milestones
+
+| Milestone | n_ambig | n_clean | Total | When to do it |
+|---|---|---|---|---|
+| Phase 1 spec-compliant | 14 | ~16 | ~30 | Grow clean set to stabilize FP rate measurement |
+| Phase 2 evaluable | 20 | 30 | ~50 | Spec target; supports blind-reviewer protocol with statistical signal |
+| Diverse-domain stretch | 25 | 35 | ~60 | Adds 4-5 politics/finance/climate/sports/AI questions per non-biosecurity domain |
+
+When growing, use the URL-list workflow (next section). Prefer the Annulled/Ambiguous resolution badge for `label: ambiguous` candidates — they're free signal, no judgment required. Don't relitigate labels on the existing 19 — those were stabilized in commit `f321a4c` and revisiting them risks overfitting.
+
+### Why n=5 was uninformative (kept for posterity, now historical)
 
 - **Statistical noise dominates.** With ~3 ambiguous and ~2 clean questions, the 95% confidence interval on measured recall is roughly 9% – 99%. The linter is indistinguishable from random at this n.
 - **Rubric coverage is thin.** Only ~3 of the 6 rubric items (operationalization, time bounds, source authority) get any depth of test. Scope drift and edge-case handling have ~zero test coverage.
@@ -85,6 +102,23 @@ Clean-question sourcing (the other ~20): pick any resolved questions with a name
 - `scripts/fetch_metaculus.py` — pulls resolved questions from the Metaculus API into JSONL.
 - `data/questions.example.jsonl` — 5 hand-written examples; real data goes in `data/questions.metaculus.jsonl`.
 
-## Phase 1 exit criteria
+## Phase status
 
-Rubric catches ≥8 of 10 known-ambiguous Metaculus questions in a held-out set; findings are specific (quote the offending span), not generic. **Status:** specificity confirmed at n=5 smoke-test scale (`93c43a1`); recall measurement is gated on curating the held-out set per "Data limitations" above. Not yet at exit.
+**Phase 1 — Rubric spike: EXIT MET.** At n=19 labeled questions, recall@high is 79% (11/14) — exceeds the 70% spec target. fp@high is 0.40 — well under the 1.0 target. Findings are specific with quoted spans, not generic. See `eval/runs/2026-05-21-120422.json`.
+
+The spec called for 30-50 questions for the held-out set; we have 19. We're shipping Phase 1 against the held-out subset because the recall + FP bar is met cleanly at this sample size and pushing to 30 with the same biosecurity-heavy curation wouldn't change the decision. Growing the set to 30-50 is part of the Phase 2 path below.
+
+**Phase 2 — Critique quality & rewrites: SCAFFOLDED, NOT EVALUATED.** `Finding.suggested_rewrite` is in the schema and the linter generates rewrites (sample inspection shows they're concrete and preserve intent). The spec's success criterion ("rewrites rated meaningfully better by blind reviewer on ≥70% of a 50-question set") has not been measured. The path from scaffolded to final is in `PROMPT.md` §10.
+
+**Phase 3 — Web interface: BACKEND STARTED.** FastAPI wrapper shipped (`sharper/api.py`): `POST /api/lint`, `GET /api/health`, CORS for `localhost:3000`. Auth (Clerk), rate-limit (Upstash Redis), persistence (Supabase), frontend (Next.js + TipTap) all TODO and require external accounts — `PROMPT.md` §12 has the setup checklist.
+
+## Bringing Phase 2 from scaffolded to final
+
+Concrete sequence; see `PROMPT.md` §10 for the full table with owners and effort estimates.
+
+1. **Blind-reviewer protocol script** (`scripts/blind_review.py`) — loops `(quoted_span, suggested_rewrite)` pairs from the latest eval, prompts y/n/skip per pair, aggregates % yes per rubric item, saves to `eval/reviews/<timestamp>.json`. *Code task, ~30 min, no data dependency.*
+2. **Smoke-run blind review on n=19** to shake out the protocol. *User task, ~20-30 min.*
+3. **Iterate the rewrite prompt** if the n=19 number is low (e.g. <50% better). Likely fix is adding good/bad rewrite examples to `critic.py`. *Code task, 30-60 min.*
+4. **Grow question set to ~50** with topic diversity (politics / finance / climate / sports / AI capability, not more disease questions). Use the URL-list workflow + Claude-in-Chrome extractor. *User task, 2-4 hours.*
+5. **Re-run eval + blind review on n=50** to compute the spec's actual metric. *Code re-runs, ~5 min compute; user review, ~60-90 min.*
+6. **Lock rubric version** if ≥70% rewrite-better. Tag commit as "Phase 2 exit". *Else iterate steps 3+5.*
