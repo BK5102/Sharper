@@ -1,0 +1,698 @@
+{
+  "timestamp": "2026-05-21-204554",
+  "source_run": "eval\\runs\\2026-05-21-121442.json",
+  "shuffle_seed": 42,
+  "summary": {
+    "n_reviewed": 51,
+    "n_yes": 48,
+    "n_no": 3,
+    "n_skipped": 10,
+    "fraction_yes": 0.9411764705882353,
+    "phase2_target_pct": 70,
+    "meets_phase2_target": true,
+    "by_rubric_item": {
+      "edge_case_handling": {
+        "yes": 15,
+        "no": 0,
+        "n_rated": 15,
+        "fraction_yes": 1.0
+      },
+      "time_bound_specification": {
+        "yes": 6,
+        "no": 1,
+        "n_rated": 7,
+        "fraction_yes": 0.8571428571428571
+      },
+      "source_authority": {
+        "yes": 13,
+        "no": 1,
+        "n_rated": 14,
+        "fraction_yes": 0.9285714285714286
+      },
+      "operationalization": {
+        "yes": 11,
+        "no": 0,
+        "n_rated": 11,
+        "fraction_yes": 1.0
+      },
+      "scope_drift": {
+        "yes": 0,
+        "no": 1,
+        "n_rated": 1,
+        "fraction_yes": 0.0
+      },
+      "resolution_criteria_clarity": {
+        "yes": 3,
+        "no": 0,
+        "n_rated": 3,
+        "fraction_yes": 1.0
+      }
+    },
+    "by_severity": {
+      "medium": {
+        "yes": 26,
+        "no": 1,
+        "n_rated": 27,
+        "fraction_yes": 0.9629629629629629
+      },
+      "high": {
+        "yes": 13,
+        "no": 1,
+        "n_rated": 14,
+        "fraction_yes": 0.9285714285714286
+      },
+      "low": {
+        "yes": 9,
+        "no": 1,
+        "n_rated": 10,
+        "fraction_yes": 0.9
+      }
+    },
+    "by_label": {
+      "ambiguous": {
+        "yes": 38,
+        "no": 3,
+        "n_rated": 41,
+        "fraction_yes": 0.926829268292683
+      },
+      "clean": {
+        "yes": 10,
+        "no": 0,
+        "n_rated": 10,
+        "fraction_yes": 1.0
+      }
+    }
+  },
+  "verdicts": [
+    {
+      "question_id": "metaculus-25846",
+      "title": "Will Israel invade Lebanon before October 1, 2024?",
+      "label": "ambiguous",
+      "rubric_item": "edge_case_handling",
+      "severity": "medium",
+      "quoted_span": "either the Government of Israel or any two Permanent Members of the United Nations Security Council announce or acknowledge that Israeli ground troops have entered Lebanese territory",
+      "suggested_rewrite": "either the Government of Israel, any two Permanent Members of the United Nations Security Council, or consistent reporting from at least two named wire services (AP, Reuters, or AFP) announce or acknowledge that Israeli ground troops have entered Lebanese territory",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-900",
+      "title": "Will the current Ebola outbreak be contained to under 50 cases?",
+      "label": "ambiguous",
+      "rubric_item": "time_bound_specification",
+      "severity": "high",
+      "quoted_span": "Resolution will be based on WHO data when they declare the outbreak over.",
+      "suggested_rewrite": "Resolution will be based on WHO data when they declare the outbreak over, or by December 31, 2018 if no declaration has been made by that date (in which case the cumulative confirmed+probable case count at that date will be used).",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-25877",
+      "title": "Will exactly 3 Starship launches reach reach an altitude of 160 kilometers by Sept 30, 2024?",
+      "label": "ambiguous",
+      "rubric_item": "time_bound_specification",
+      "severity": "low",
+      "quoted_span": "by Sept 30, 2024",
+      "suggested_rewrite": "by 23:59 UTC on September 30, 2024",
+      "verdict": "no"
+    },
+    {
+      "question_id": "metaculus-10977",
+      "title": "Will WHO declare the spread of monkeypox a Public Health Emergency of International Concern before 2023?",
+      "label": "clean",
+      "rubric_item": "source_authority",
+      "severity": "medium",
+      "quoted_span": "WHO declares that the spread of monkeypox constitutes a PHEIC",
+      "suggested_rewrite": "WHO officially announces, via a formal Director-General statement or IHR Emergency Committee report published on the WHO website, that the spread of monkeypox constitutes a PHEIC",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-20005",
+      "title": "Will Sam Altman and Greg Brockman start a new AI company, or join a competitor to OpenAI, before 2025?",
+      "label": "clean",
+      "rubric_item": "source_authority",
+      "severity": "high",
+      "quoted_span": "Metaculus may make a determination if there is ambiguity regarding whether a company founded by or employing both individuals aims to train foundation models.",
+      "suggested_rewrite": "Any ambiguity regarding whether a company aims to train foundation models will be resolved using the company's own public statements (e.g., official website, press releases, or SEC/regulatory filings) describing its core technical mission.",
+      "verdict": "skip"
+    },
+    {
+      "question_id": "metaculus-2573",
+      "title": "Will the current Ebola outbreak claim more than 1000 lives?",
+      "label": "ambiguous",
+      "rubric_item": "source_authority",
+      "severity": "high",
+      "quoted_span": "Resolution is by credible media report, or by the Congolese Government: https://us13.campaign-archive.com/home/?u=89e5755d2cca4840b1af93176&id=976e10809f",
+      "suggested_rewrite": "Resolution is by WHO Ebola situation reports (https://www.who.int/emergencies/situations/ebola-DRC-2019) or official DRC Ministry of Health bulletins.",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-14460",
+      "title": "Will Russian troops reach the center of Bakhmut, Ukraine before 0000 hrs local time on January 20th, 2023?",
+      "label": "ambiguous",
+      "rubric_item": "operationalization",
+      "severity": "high",
+      "quoted_span": "Resolution time will be the best estimate of when, exactly, the Russian troops entered, not the time of the subsequent report. Admins will use their best considered judgment of reliable sources to determine this.",
+      "suggested_rewrite": "Resolution time will be the earliest timestamp cited by any of the two qualifying sources confirming entry; if sources differ, the earlier of the two cited times will be used.",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-14460",
+      "title": "Will Russian troops reach the center of Bakhmut, Ukraine before 0000 hrs local time on January 20th, 2023?",
+      "label": "ambiguous",
+      "rubric_item": "edge_case_handling",
+      "severity": "medium",
+      "quoted_span": "It will resolve No if such reports are not forthcoming by midnight local time on January 21st, 2023.",
+      "suggested_rewrite": "It will resolve No if, by midnight local time on January 21st, 2023, at least two qualifying sources have not reported that Russian troops reached the defined zone before midnight January 20th, 2023; late-arriving reports published after January 21st will not be considered.",
+      "verdict": "skip"
+    },
+    {
+      "question_id": "metaculus-25703",
+      "title": "On Sept 15, 2024, will Nvidia's market capitalization be larger than Apple's?",
+      "label": "ambiguous",
+      "rubric_item": "edge_case_handling",
+      "severity": "medium",
+      "quoted_span": "when checked by Metaculus at approximately 4 PM EDT (8 PM UTC)",
+      "suggested_rewrite": "when checked by Metaculus at the market close on Sept 15, 2024 (approximately 4 PM EDT / 8 PM UTC), using the closing price data",
+      "verdict": "skip"
+    },
+    {
+      "question_id": "metaculus-2573",
+      "title": "Will the current Ebola outbreak claim more than 1000 lives?",
+      "label": "ambiguous",
+      "rubric_item": "time_bound_specification",
+      "severity": "high",
+      "quoted_span": "Will this outbreak claim more than 1000 lives before it is declared over by the WHO?",
+      "suggested_rewrite": "Will this outbreak claim more than 1000 lives before it is declared over by the WHO, or before [DATE], whichever comes first?",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-2793",
+      "title": "Will the current Ebola outbreak in the DRC be ongoing after February 2020?",
+      "label": "clean",
+      "rubric_item": "operationalization",
+      "severity": "low",
+      "quoted_span": "declared over by the World Health Organisation",
+      "suggested_rewrite": "formally declared over by the WHO via an official Director-General statement or Disease Outbreak News declaration",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-20127",
+      "title": "Will any country score in the top tier overall in the next Global Health Security Index?",
+      "label": "ambiguous",
+      "rubric_item": "edge_case_handling",
+      "severity": "medium",
+      "quoted_span": "If the next report is not published before January 1, 2026 or the scoring system changes, this question will be annulled.",
+      "suggested_rewrite": "If the next report is not published before January 1, 2026, or the top-tier threshold is no longer defined as an overall score of 80.1 or more out of 100, this question will be annulled.",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-42472",
+      "title": "Will the US and Iran agree to a ceasefire before May 2026?",
+      "label": "clean",
+      "rubric_item": "time_bound_specification",
+      "severity": "low",
+      "quoted_span": "before May 1, 2026",
+      "suggested_rewrite": "before May 1, 2026 (00:00 UTC)",
+      "verdict": "skip"
+    },
+    {
+      "question_id": "metaculus-25701",
+      "title": "Will OpenAI publish information describing Q* (Q-Star) by Sept 30, 2024?",
+      "label": "ambiguous",
+      "rubric_item": "edge_case_handling",
+      "severity": "medium",
+      "quoted_span": "A description specifically of Q* must be provided, a description of a system or method characterized as a successor to Q* would not qualify.",
+      "suggested_rewrite": "A description specifically of the system or method originally referred to as Q* must be provided; descriptions of any system characterized as incorporating, evolving from, renaming, or succeeding Q* would not qualify unless OpenAI explicitly states the system described is Q*.",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-42472",
+      "title": "Will the US and Iran agree to a ceasefire before May 2026?",
+      "label": "clean",
+      "rubric_item": "operationalization",
+      "severity": "medium",
+      "quoted_span": "an official bilateral ceasefire between the United States and Iran has gone into effect",
+      "suggested_rewrite": "a ceasefire between the United States and Iran, publicly announced by both governments and acknowledged by each party as mutually binding, has gone into effect",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-25701",
+      "title": "Will OpenAI publish information describing Q* (Q-Star) by Sept 30, 2024?",
+      "label": "ambiguous",
+      "rubric_item": "operationalization",
+      "severity": "high",
+      "quoted_span": "must provide some information about what Q* is (for example, giving an overview of how Q* works without delving into technical detail)",
+      "suggested_rewrite": "must provide at least one substantive claim about what Q* is or how it works (e.g., its approach, architecture, goal, or capabilities), beyond merely naming it",
+      "verdict": "skip"
+    },
+    {
+      "question_id": "metaculus-6557",
+      "title": "Will there be at least 1,000 Ebola deaths in 2021?",
+      "label": "ambiguous",
+      "rubric_item": "operationalization",
+      "severity": "medium",
+      "quoted_span": "died in 2021 due to Ebola infection",
+      "suggested_rewrite": "died in 2021 due to confirmed or probable Ebola infection, as classified by WHO outbreak reports",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-2573",
+      "title": "Will the current Ebola outbreak claim more than 1000 lives?",
+      "label": "ambiguous",
+      "rubric_item": "edge_case_handling",
+      "severity": "medium",
+      "quoted_span": "before it is declared over by the WHO",
+      "suggested_rewrite": "before it is declared over by the WHO or before the question close date, whichever comes first; deaths counted are those attributed to this outbreak by WHO situation reports",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-13638",
+      "title": "Will Poland and Ukraine settle the Przewodów incident before 2024?",
+      "label": "ambiguous",
+      "rubric_item": "source_authority",
+      "severity": "medium",
+      "quoted_span": "the Polish state has published formal inter-state diplomatic correspondence",
+      "suggested_rewrite": "the Polish Ministry of Foreign Affairs or the Office of the President of Poland has published formal inter-state diplomatic correspondence on its official website",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-6557",
+      "title": "Will there be at least 1,000 Ebola deaths in 2021?",
+      "label": "ambiguous",
+      "rubric_item": "time_bound_specification",
+      "severity": "low",
+      "quoted_span": "at least 1,000 Ebola deaths in 2021",
+      "suggested_rewrite": "at least 1,000 Ebola deaths occurring between January 1, 2021 and December 31, 2021 (inclusive), regardless of when reported",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-2934",
+      "title": "Before 30 November 2019, will an Ebola health worker be injured or killed in an attack against an Ebola facility inside the Central African Republic, South Sudan, Uganda, Rwanda, Burundi, or Tanzania?",
+      "label": "ambiguous",
+      "rubric_item": "time_bound_specification",
+      "severity": "low",
+      "quoted_span": "Before 30 November 2019",
+      "suggested_rewrite": "Before 23:59 UTC on 29 November 2019 (i.e., the question resolves on events occurring up to and including 29 November 2019)",
+      "verdict": "skip"
+    },
+    {
+      "question_id": "metaculus-10977",
+      "title": "Will WHO declare the spread of monkeypox a Public Health Emergency of International Concern before 2023?",
+      "label": "clean",
+      "rubric_item": "time_bound_specification",
+      "severity": "high",
+      "quoted_span": "before 2023",
+      "suggested_rewrite": "before January 1, 2023 (i.e., by December 31, 2022)",
+      "verdict": "skip"
+    },
+    {
+      "question_id": "metaculus-20171",
+      "title": "Will Huada Empyrean be publicly traded in 2026?",
+      "label": "ambiguous",
+      "rubric_item": "time_bound_specification",
+      "severity": "medium",
+      "quoted_span": "listed on a public stock exchange on January 1st, 2026",
+      "suggested_rewrite": "listed on a public stock exchange at any point during calendar year 2026 (i.e., between January 1, 2026 and December 31, 2026, inclusive)",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-2573",
+      "title": "Will the current Ebola outbreak claim more than 1000 lives?",
+      "label": "ambiguous",
+      "rubric_item": "operationalization",
+      "severity": "medium",
+      "quoted_span": "in the near future",
+      "suggested_rewrite": "within the next 6 months",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-20171",
+      "title": "Will Huada Empyrean be publicly traded in 2026?",
+      "label": "ambiguous",
+      "rubric_item": "scope_drift",
+      "severity": "medium",
+      "quoted_span": "Will Huada Empyrean be publicly traded in 2026?",
+      "suggested_rewrite": "Will Empyrean Technology (华大九天 / Huada Empyrean) be publicly traded in 2026?",
+      "verdict": "no"
+    },
+    {
+      "question_id": "metaculus-900",
+      "title": "Will the current Ebola outbreak be contained to under 50 cases?",
+      "label": "ambiguous",
+      "rubric_item": "operationalization",
+      "severity": "high",
+      "quoted_span": "Will this outbreak be contained to less than 50 cases of Ebola?",
+      "suggested_rewrite": "Will this outbreak be contained to fewer than 50 total cases of Ebola as reported by WHO (counting confirmed and probable cases combined)?",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-41091",
+      "title": "Will the WHO declare a Public Health Emergency of International Concern in 2026?",
+      "label": "clean",
+      "rubric_item": "edge_case_handling",
+      "severity": "medium",
+      "quoted_span": "declares a new Public Health Emergency of International Concern (PHEIC)",
+      "suggested_rewrite": "declares a new Public Health Emergency of International Concern (PHEIC) that is not subsequently retracted or annulled before January 1, 2027",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-25701",
+      "title": "Will OpenAI publish information describing Q* (Q-Star) by Sept 30, 2024?",
+      "label": "ambiguous",
+      "rubric_item": "source_authority",
+      "severity": "medium",
+      "quoted_span": "from public statements by OpenAI staff, including interviews, media appearances, or podcasts (this does not include statements made anonymously or on background)",
+      "suggested_rewrite": "from verifiable, on-the-record public statements by named OpenAI staff (e.g., published transcripts, official recordings, or articles in named outlets such as The New York Times, Reuters, or Bloomberg), not including statements made anonymously or on background",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-900",
+      "title": "Will the current Ebola outbreak be contained to under 50 cases?",
+      "label": "ambiguous",
+      "rubric_item": "edge_case_handling",
+      "severity": "medium",
+      "quoted_span": "Resolution will be based on WHO data when they declare the outbreak over.",
+      "suggested_rewrite": "Resolution will be based on the case count in the WHO situation report at the time they formally declare this specific outbreak (DRC, Bikoro, May 2018) over, using figures as published at that date without subsequent revisions.",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-25877",
+      "title": "Will exactly 3 Starship launches reach reach an altitude of 160 kilometers by Sept 30, 2024?",
+      "label": "ambiguous",
+      "rubric_item": "source_authority",
+      "severity": "high",
+      "quoted_span": "may also consider data or reporting from aerospace monitoring organizations or authorities, as well as other credible sources such as international media outlets",
+      "suggested_rewrite": "The resolution will be based on official mission reports from SpaceX. In the absence of official SpaceX data, data from the U.S. Space Force or FAA licensing records may be used.",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-20005",
+      "title": "Will Sam Altman and Greg Brockman start a new AI company, or join a competitor to OpenAI, before 2025?",
+      "label": "clean",
+      "rubric_item": "operationalization",
+      "severity": "low",
+      "quoted_span": "aims to train foundation models",
+      "suggested_rewrite": "has publicly stated as a primary mission or core product the development or training of foundation models (as evidenced by official announcements, published research, or investor communications)",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-2934",
+      "title": "Before 30 November 2019, will an Ebola health worker be injured or killed in an attack against an Ebola facility inside the Central African Republic, South Sudan, Uganda, Rwanda, Burundi, or Tanzania?",
+      "label": "ambiguous",
+      "rubric_item": "edge_case_handling",
+      "severity": "medium",
+      "quoted_span": "will an Ebola health worker be injured or killed in an attack against an Ebola facility inside the Central African Republic, South Sudan, Uganda, Rwanda, Burundi, or Tanzania?",
+      "suggested_rewrite": "will a person employed or volunteering in any capacity for an Ebola response operation (including clinical staff, community health workers, logisticians, and security personnel assigned to an Ebola facility) be injured or killed in an attack against an Ebola facility inside the Central African Republic, South Sudan, Uganda, Rwanda, Burundi, or Tanzania?",
+      "verdict": "skip"
+    },
+    {
+      "question_id": "metaculus-14460",
+      "title": "Will Russian troops reach the center of Bakhmut, Ukraine before 0000 hrs local time on January 20th, 2023?",
+      "label": "ambiguous",
+      "rubric_item": "operationalization",
+      "severity": "low",
+      "quoted_span": "the area within the city limits of Bakhmut, minus everything eastwards of the eastern bank of the Bakhmutovka river",
+      "suggested_rewrite": "the area within the city limits of Bakhmut as defined by the pre-war Ukrainian administrative boundary (e.g. OpenStreetMap or official Ukrainian cadastral data), minus everything eastwards of the eastern bank of the Bakhmutovka river",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-900",
+      "title": "Will the current Ebola outbreak be contained to under 50 cases?",
+      "label": "ambiguous",
+      "rubric_item": "source_authority",
+      "severity": "low",
+      "quoted_span": "Resolution will be based on WHO data",
+      "suggested_rewrite": "Resolution will be based on the cumulative case count in WHO's official Situation Reports for this outbreak",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-13638",
+      "title": "Will Poland and Ukraine settle the Przewodów incident before 2024?",
+      "label": "ambiguous",
+      "rubric_item": "operationalization",
+      "severity": "high",
+      "quoted_span": "no outstanding unsettled claims or disputes with Ukraine arising from the Przewodów incident which require state-level action",
+      "suggested_rewrite": "no outstanding unsettled claims or disputes with Ukraine arising from the Przewodów incident, as explicitly stated in a formal bilateral communiqué, a signed inter-state agreement, or a public official statement by the Polish President or their designated spokesperson",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-10977",
+      "title": "Will WHO declare the spread of monkeypox a Public Health Emergency of International Concern before 2023?",
+      "label": "clean",
+      "rubric_item": "edge_case_handling",
+      "severity": "low",
+      "quoted_span": "If this is the case, this question will resolve ambiguously.",
+      "suggested_rewrite": "If WHO formally reclassifies monkeypox under its smallpox categorization (as evidenced by an official WHO or IHR announcement), this question will resolve ambiguously.",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-20127",
+      "title": "Will any country score in the top tier overall in the next Global Health Security Index?",
+      "label": "ambiguous",
+      "rubric_item": "time_bound_specification",
+      "severity": "medium",
+      "quoted_span": "the next Global Health Security (GHS) Index report due in 2024 (or later)",
+      "suggested_rewrite": "the next Global Health Security (GHS) Index report, published before January 1, 2026",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-13638",
+      "title": "Will Poland and Ukraine settle the Przewodów incident before 2024?",
+      "label": "ambiguous",
+      "rubric_item": "edge_case_handling",
+      "severity": "medium",
+      "quoted_span": "Claims arising from the incident which have been referred via a legal process or mutual diplomatic agreement to a court, arbitration body, or committee to decide their final disposition do not count as requiring further state-level action.",
+      "suggested_rewrite": "Claims arising from the incident which have been referred via a legal process or mutual diplomatic agreement to a court, arbitration body, or committee to decide their final disposition do not count as requiring further state-level action. The most recent qualifying statement by the Polish state before the resolution deadline governs resolution.",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-25846",
+      "title": "Will Israel invade Lebanon before October 1, 2024?",
+      "label": "ambiguous",
+      "rubric_item": "source_authority",
+      "severity": "high",
+      "quoted_span": "From the credible sources, it must be clear that the troops are acting deliberately on orders of the Government of Israel and without permission of the currently recognized Government of Lebanon or the assent of the United Nations.",
+      "suggested_rewrite": "From official statements by the Government of Israel, the Government of Lebanon, or reporting from at least two of AP, Reuters, AFP, BBC, or the New York Times, it must be clear that the troops are acting deliberately on orders of the Government of Israel and without permission of the currently recognized Government of Lebanon or the assent of the United Nations.",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-42472",
+      "title": "Will the US and Iran agree to a ceasefire before May 2026?",
+      "label": "clean",
+      "rubric_item": "source_authority",
+      "severity": "medium",
+      "quoted_span": "mutually agreed to by the United States and Iran",
+      "suggested_rewrite": "mutually agreed to by the United States and Iran, as confirmed by official statements from the U.S. State Department (or White House) and the Iranian government (Ministry of Foreign Affairs or Office of the Supreme Leader)",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-25877",
+      "title": "Will exactly 3 Starship launches reach reach an altitude of 160 kilometers by Sept 30, 2024?",
+      "label": "ambiguous",
+      "rubric_item": "edge_case_handling",
+      "severity": "medium",
+      "quoted_span": "so long as the Starship reaches such altitude substantially intact, it will count",
+      "suggested_rewrite": "so long as the Starship's main body structure (Super Heavy booster or Ship stage) reaches such altitude without complete disintegration, it will count",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-2750",
+      "title": "Will the current DRC Ebola outbreak end by February 2020?",
+      "label": "ambiguous",
+      "rubric_item": "scope_drift",
+      "severity": "high",
+      "quoted_span": "Will the current DRC Ebola outbreak end by February 2020?",
+      "suggested_rewrite": "Will the current DRC Ebola outbreak still be ongoing on 29 February 2020?",
+      "verdict": "skip"
+    },
+    {
+      "question_id": "metaculus-13638",
+      "title": "Will Poland and Ukraine settle the Przewodów incident before 2024?",
+      "label": "ambiguous",
+      "rubric_item": "resolution_criteria_clarity",
+      "severity": "medium",
+      "quoted_span": "the Polish state has published formal inter-state diplomatic correspondence in which it affirms",
+      "suggested_rewrite": "the Polish state has published a formal diplomatic note verbale, bilateral communiqué, or official press release addressed to or jointly issued with Ukraine in which it affirms",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-14460",
+      "title": "Will Russian troops reach the center of Bakhmut, Ukraine before 0000 hrs local time on January 20th, 2023?",
+      "label": "ambiguous",
+      "rubric_item": "edge_case_handling",
+      "severity": "medium",
+      "quoted_span": "Russian troops who are not prisoners, defectors, surrendering, bailed-out, etc",
+      "suggested_rewrite": "Russian troops who are not prisoners, defectors, surrendering, bailed out under ceasefire, or otherwise present involuntarily or non-combatively",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-6557",
+      "title": "Will there be at least 1,000 Ebola deaths in 2021?",
+      "label": "ambiguous",
+      "rubric_item": "source_authority",
+      "severity": "high",
+      "quoted_span": "the WHO, or credible media reports",
+      "suggested_rewrite": "the WHO situation reports or WHO Disease Outbreak News",
+      "verdict": "no"
+    },
+    {
+      "question_id": "metaculus-2934",
+      "title": "Before 30 November 2019, will an Ebola health worker be injured or killed in an attack against an Ebola facility inside the Central African Republic, South Sudan, Uganda, Rwanda, Burundi, or Tanzania?",
+      "label": "ambiguous",
+      "rubric_item": "operationalization",
+      "severity": "high",
+      "quoted_span": "will an Ebola health worker be injured or killed in an attack against an Ebola facility",
+      "suggested_rewrite": "will an Ebola health worker be physically injured or killed as a direct result of a deliberate violent act (including but not limited to armed assault, arson, or mob violence) targeting an Ebola treatment or response facility",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-25846",
+      "title": "Will Israel invade Lebanon before October 1, 2024?",
+      "label": "ambiguous",
+      "rubric_item": "source_authority",
+      "severity": "high",
+      "quoted_span": "reporting from credible sources indicates that the number of troops entering is more than 100",
+      "suggested_rewrite": "reporting from at least two of the following sources — AP, Reuters, AFP, BBC, or the New York Times — indicates that the number of troops entering is more than 100",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-1329",
+      "title": "Will the latest Ebola outbreak be stopped before it claims a hundred lives?",
+      "label": "ambiguous",
+      "rubric_item": "source_authority",
+      "severity": "high",
+      "quoted_span": "Resolution is by credible media report.",
+      "suggested_rewrite": "Resolution is based on an official declaration by the World Health Organization (WHO) on its website (https://www.who.int) or in a formal WHO situation report.",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-25703",
+      "title": "On Sept 15, 2024, will Nvidia's market capitalization be larger than Apple's?",
+      "label": "ambiguous",
+      "rubric_item": "source_authority",
+      "severity": "medium",
+      "quoted_span": "Metaculus may consider other credible sources to resolve this question",
+      "suggested_rewrite": "Metaculus will use Yahoo Finance or Bloomberg as a fallback source to resolve this question",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-25877",
+      "title": "Will exactly 3 Starship launches reach reach an altitude of 160 kilometers by Sept 30, 2024?",
+      "label": "ambiguous",
+      "rubric_item": "resolution_criteria_clarity",
+      "severity": "high",
+      "quoted_span": "This question will resolve as the number of SpaceX Starship launches that reach an altitude of at least 160 kilometers",
+      "suggested_rewrite": "This question will resolve YES if exactly 3 SpaceX Starship launches reach an altitude of at least 160 kilometers (approximately 100 miles) above the Earth's surface by Sept 30, 2024, and NO otherwise.",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-20171",
+      "title": "Will Huada Empyrean be publicly traded in 2026?",
+      "label": "ambiguous",
+      "rubric_item": "source_authority",
+      "severity": "low",
+      "quoted_span": "the name change can be confirmed via Wikipedia or credible news reports",
+      "suggested_rewrite": "the name change can be confirmed via Wikipedia or major financial/news outlets (e.g., Reuters, Bloomberg, or the relevant stock exchange's official listing database)",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-1329",
+      "title": "Will the latest Ebola outbreak be stopped before it claims a hundred lives?",
+      "label": "ambiguous",
+      "rubric_item": "resolution_criteria_clarity",
+      "severity": "high",
+      "quoted_span": "Will this outbreak be declared over by the WHO before it claims 100 lives?",
+      "suggested_rewrite": "This question resolves Yes if the WHO officially declares this Kivu outbreak over with a confirmed death toll strictly below 100. It resolves No if the WHO-declared death toll reaches 100 or more at any point before or at the time of the WHO end-of-outbreak announcement, or if no WHO end-of-outbreak declaration is issued by the question close date.",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-14460",
+      "title": "Will Russian troops reach the center of Bakhmut, Ukraine before 0000 hrs local time on January 20th, 2023?",
+      "label": "ambiguous",
+      "rubric_item": "source_authority",
+      "severity": "medium",
+      "quoted_span": "Ukrainian officials",
+      "suggested_rewrite": "Official statements from the Ukrainian Ministry of Defence or the General Staff of the Armed Forces of Ukraine (published on their official channels)",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-2793",
+      "title": "Will the current Ebola outbreak in the DRC be ongoing after February 2020?",
+      "label": "clean",
+      "rubric_item": "edge_case_handling",
+      "severity": "medium",
+      "quoted_span": "positive if it has not been declared over by the World Health Organisation by the end of the 29th of February 2020.",
+      "suggested_rewrite": "positive if the World Health Organisation has not issued a formal 'end of outbreak' declaration for the 2018 Kivu Ebola outbreak by 23:59 UTC on 29 February 2020, regardless of any subsequent re-declarations.",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-2750",
+      "title": "Will the current DRC Ebola outbreak end by February 2020?",
+      "label": "ambiguous",
+      "rubric_item": "edge_case_handling",
+      "severity": "medium",
+      "quoted_span": "negative if it has been declared over by the World Health Organisation by the end of the 29th of February 2020.",
+      "suggested_rewrite": "negative if the WHO has declared the outbreak over and has not subsequently reversed that declaration, by the end of 29 February 2020.",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-2750",
+      "title": "Will the current DRC Ebola outbreak end by February 2020?",
+      "label": "ambiguous",
+      "rubric_item": "time_bound_specification",
+      "severity": "low",
+      "quoted_span": "by the end of the 29th of February 2020",
+      "suggested_rewrite": "by 23:59 UTC on 29 February 2020",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-20005",
+      "title": "Will Sam Altman and Greg Brockman start a new AI company, or join a competitor to OpenAI, before 2025?",
+      "label": "clean",
+      "rubric_item": "edge_case_handling",
+      "severity": "medium",
+      "quoted_span": "both Sam Altman and Greg Brockman are either: Cofounders of a new company that aims to train foundation models Employees of an existing company that aims to train foundation models",
+      "suggested_rewrite": "both Sam Altman and Greg Brockman hold a role (as cofounder, executive, or employee) at the same company that aims to train foundation models — they need not hold identical roles, but both must be actively affiliated with the company at the same point in time",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-25701",
+      "title": "Will OpenAI publish information describing Q* (Q-Star) by Sept 30, 2024?",
+      "label": "ambiguous",
+      "rubric_item": "edge_case_handling",
+      "severity": "low",
+      "quoted_span": "will resolve the question as Yes when all criteria are met",
+      "suggested_rewrite": "This question will resolve as Yes only if both criteria (a qualifying document and a public acknowledgment that it describes Q*) are met on or before Sept 30, 2024. If either criterion is unmet by that date, the question resolves No.",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-41091",
+      "title": "Will the WHO declare a Public Health Emergency of International Concern in 2026?",
+      "label": "clean",
+      "rubric_item": "edge_case_handling",
+      "severity": "medium",
+      "quoted_span": "\"new\" means not under a PHEIC as of December 2025",
+      "suggested_rewrite": "\"new\" means not under a PHEIC as of 23:59 UTC on December 31, 2025",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-1329",
+      "title": "Will the latest Ebola outbreak be stopped before it claims a hundred lives?",
+      "label": "ambiguous",
+      "rubric_item": "operationalization",
+      "severity": "medium",
+      "quoted_span": "before it claims 100 lives",
+      "suggested_rewrite": "before the WHO situation report records 100 or more total deaths (confirmed + probable)",
+      "verdict": "yes"
+    },
+    {
+      "question_id": "metaculus-25846",
+      "title": "Will Israel invade Lebanon before October 1, 2024?",
+      "label": "ambiguous",
+      "rubric_item": "operationalization",
+      "severity": "low",
+      "quoted_span": "without permission of the currently recognized Government of Lebanon",
+      "suggested_rewrite": "without permission of the Government of Lebanon as recognized by the United Nations",
+      "verdict": "skip"
+    }
+  ]
+}

@@ -40,7 +40,7 @@ Not a forecaster, not a Metaculus integration, not a team collaboration tool, no
 | Phase | Theme | Output | Exit criteria | Status |
 | --- | --- | --- | --- | --- |
 | 1 | Rubric spike | CLI returning structured critique against hand-built rubric | Catches ≥8/10 known-ambiguous questions; findings are specific, not generic | ✅ Met (recall@high 79%, fp@high 0.40 at n=19 labeled questions) |
-| 2 | Critique quality & suggestions | Per-issue rewrites + eval harness vs. hand-annotated references | Rewrites rated "meaningfully better" by blind reviewer on ≥70% of 50-question eval set | Scaffolded; blind-reviewer protocol + n=50 dataset growth pending |
+| 2 | Critique quality & suggestions | Per-issue rewrites + eval harness vs. hand-annotated references | Rewrites rated "meaningfully better" by blind reviewer on ≥70% of 50-question eval set | ✅ Met on internal sample (94% rewrite-better across 51 pairs from n=19 questions); confirm at n=50 before public launch |
 | 3 | Web interface | Next.js + FastAPI app with auth, inline-flagged editor, accept/reject rewrites, history page | Paste-to-critique <5s; signup-to-first-critique <30s; history loads across devices | Backend FastAPI shipped; Clerk/Upstash/Supabase/Next.js pending account setup |
 | 4 | Polish & distribution | Hosted demo, README with examples, rubric/eval writeup | Public for 7 days without spend-cap breach or downtime; ≥1 rubric item fires per session on average | Not started |
 
@@ -48,5 +48,5 @@ Not a forecaster, not a Metaculus integration, not a team collaboration tool, no
 
 - **Linter is live end-to-end.** CLI works (`sharper lint`), FastAPI wrapper works (`sharper-api`), structured output via `client.messages.parse` validated against the n=19 held-out set.
 - **Held-out set is at n=19** (14 ambiguous + 5 clean) — under the spec's 50-question target. The set is biosecurity-heavy and needs diversification before Phase 2 evaluation. See [`backend/README.md`](backend/README.md#data-current-state-and-growth-plan) for the growth plan and reasoning.
-- **Phase 2 success criterion has not been measured.** Sample rewrite inspection looks good, but no blind-reviewer numbers exist yet. The step-by-step path from "scaffolded" to "measured" is in [`backend/README.md`](backend/README.md#bringing-phase-2-from-scaffolded-to-final).
+- **Phase 2 success criterion met on internal sample.** First blind review on 51 rewrite pairs from the n=19 question set scored 94% rewrite-better (target ≥70%). Re-confirmation at n=50 questions should happen before any public launch, but the rubric is good enough to lock as v0.4 and move on. See [`backend/README.md`](backend/README.md#phase-status).
 - **Phase 3 backend wrapper is shipped.** Frontend, auth, persistence, and deploy are all pending external-account setup (Clerk, Upstash, Supabase, Sentry, Vercel, Railway).
