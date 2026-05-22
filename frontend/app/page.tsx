@@ -8,6 +8,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { lint, type ApiError, type Critique, type Finding } from "@/lib/api";
 import { PasteArea } from "@/components/PasteArea";
 import { FindingCard } from "@/components/FindingCard";
+import { ExampleGallery } from "@/components/ExampleGallery";
 
 const SEVERITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };
 
@@ -95,6 +96,15 @@ export default function Home() {
       <section className="mb-10">
         <PasteArea editor={editor} onSubmit={handleLint} loading={loading} />
       </section>
+
+      {!critique && !loading && (
+        <ExampleGallery
+          onTry={(text) => {
+            editor?.commands.setContent(text);
+            editor?.commands.focus("end");
+          }}
+        />
+      )}
 
       {error && (
         <div className="mb-6 rounded-md border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/30 px-4 py-3 text-sm text-red-900 dark:text-red-100">
