@@ -47,6 +47,6 @@ Not a forecaster, not a Metaculus integration, not a team collaboration tool, no
 ## Current status (2026-05-21)
 
 - **Linter is live end-to-end.** CLI works (`sharper lint`), FastAPI wrapper works (`sharper-api`), structured output via `client.messages.parse` validated against the n=19 held-out set.
-- **Held-out set is at n=19** (14 ambiguous + 5 clean) — under the spec's 50-question target. The set is biosecurity-heavy and needs diversification before Phase 2 evaluation. See [`backend/README.md`](backend/README.md#data-current-state-and-growth-plan) for the growth plan and [`PROMPT.md`](PROMPT.md) §9 for the reasoning on the pause.
-- **Phase 2 success criterion has not been measured.** Sample rewrite inspection looks good, but the blind-reviewer protocol doesn't exist yet. [`PROMPT.md`](PROMPT.md) §10 has the step-by-step path from "scaffolded" to "measured".
-- **Phase 3 backend wrapper is shipped.** Frontend, auth, persistence, and deploy are all pending external-account setup; checklist in [`PROMPT.md`](PROMPT.md) §12.
+- **Held-out set is at n=19** (14 ambiguous + 5 clean) — under the spec's 50-question target. The set is biosecurity-heavy and needs diversification before Phase 2 evaluation. See [`backend/README.md`](backend/README.md#data-current-state-and-growth-plan) for the growth plan and reasoning.
+- **Phase 2 success criterion has not been measured.** Sample rewrite inspection looks good, but no blind-reviewer numbers exist yet. The step-by-step path from "scaffolded" to "measured" is in [`backend/README.md`](backend/README.md#bringing-phase-2-from-scaffolded-to-final).
+- **Phase 3 backend wrapper is shipped.** Frontend, auth, persistence, and deploy are all pending external-account setup (Clerk, Upstash, Supabase, Sentry, Vercel, Railway).

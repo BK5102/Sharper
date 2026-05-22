@@ -108,13 +108,13 @@ Clean-question sourcing (the other ~20): pick any resolved questions with a name
 
 The spec called for 30-50 questions for the held-out set; we have 19. We're shipping Phase 1 against the held-out subset because the recall + FP bar is met cleanly at this sample size and pushing to 30 with the same biosecurity-heavy curation wouldn't change the decision. Growing the set to 30-50 is part of the Phase 2 path below.
 
-**Phase 2 — Critique quality & rewrites: SCAFFOLDED, NOT EVALUATED.** `Finding.suggested_rewrite` is in the schema and the linter generates rewrites (sample inspection shows they're concrete and preserve intent). The spec's success criterion ("rewrites rated meaningfully better by blind reviewer on ≥70% of a 50-question set") has not been measured. The path from scaffolded to final is in `PROMPT.md` §10.
+**Phase 2 — Critique quality & rewrites: SCAFFOLDED, NOT EVALUATED.** `Finding.suggested_rewrite` is in the schema and the linter generates rewrites (sample inspection shows they're concrete and preserve intent). The spec's success criterion ("rewrites rated meaningfully better by blind reviewer on ≥70% of a 50-question set") has not been measured. The path from scaffolded to final is in the section below.
 
-**Phase 3 — Web interface: BACKEND STARTED.** FastAPI wrapper shipped (`sharper/api.py`): `POST /api/lint`, `GET /api/health`, CORS for `localhost:3000`. Auth (Clerk), rate-limit (Upstash Redis), persistence (Supabase), frontend (Next.js + TipTap) all TODO and require external accounts — `PROMPT.md` §12 has the setup checklist.
+**Phase 3 — Web interface: BACKEND STARTED.** FastAPI wrapper shipped (`sharper/api.py`): `POST /api/lint`, `GET /api/health`, CORS for `localhost:3000`. Auth (Clerk), rate-limit (Upstash Redis), persistence (Supabase), frontend (Next.js + TipTap) all TODO and require external accounts (Clerk, Upstash, Supabase, Sentry, Vercel, Railway).
 
 ## Bringing Phase 2 from scaffolded to final
 
-Concrete sequence; see `PROMPT.md` §10 for the full table with owners and effort estimates.
+Concrete sequence:
 
 1. **Blind-reviewer protocol script** (`scripts/blind_review.py`) — loops `(quoted_span, suggested_rewrite)` pairs from the latest eval, prompts y/n/skip per pair, aggregates % yes per rubric item, saves to `eval/reviews/<timestamp>.json`. *Code task, ~30 min, no data dependency.*
 2. **Smoke-run blind review on n=19** to shake out the protocol. *User task, ~20-30 min.*
