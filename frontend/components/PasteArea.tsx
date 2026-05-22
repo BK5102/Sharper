@@ -1,36 +1,37 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import type { FormEvent } from "react";
+import type { Editor } from "@tiptap/react";
+import { EditorContent } from "@tiptap/react";
 
 export const MAX_CHARS = 4000;
 
 interface Props {
+  editor: Editor | null;
   onSubmit: (question: string) => void;
   loading: boolean;
-  initial?: string;
 }
 
-export function PasteArea({ onSubmit, loading, initial = "" }: Props) {
-  const [text, setText] = useState(initial);
-  const tooLong = text.length > MAX_CHARS;
+export function PasteArea({ editor, onSubmit, loading }: Props) {
+  const text = editor?.getText() ?? "";
+  const length = text.length;
+  const tooLong = length > MAX_CHARS;
   const tooShort = text.trim().length === 0;
-  const disabled = loading || tooLong || tooShort;
+  const disabled = loading || tooLong || tooShort || !editor;
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (disabled) return;
-    onSubmit(text);
+    if (disabled || !editor) return;
+    onSubmit(editor.getText());
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      <textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="Paste a draft forecasting question here — title and optional resolution criteria."
-        rows={8}
-        className="w-full resize-y rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100"
-      />
+      <div
+        className="min-h-[12rem] w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 focus-within:outline-none focus-within:ring-2 focus-within:ring-zinc-900 dark:focus-within:ring-zinc-100 [&_.ProseMirror]:min-h-[10rem] [&_.ProseMirror]:outline-none [&_.ProseMirror_p.is-editor-empty:first-child]:before:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child]:before:text-zinc-400 [&_.ProseMirror_p.is-editor-empty:first-child]:before:float-left [&_.ProseMirror_p.is-editor-empty:first-child]:before:pointer-events-none"
+      >
+        <EditorContent editor={editor} />
+      </div>
       <div className="flex items-center justify-between text-xs">
         <span
           className={
@@ -39,7 +40,7 @@ export function PasteArea({ onSubmit, loading, initial = "" }: Props) {
               : "text-zinc-500"
           }
         >
-          {text.length.toLocaleString()} / {MAX_CHARS.toLocaleString()} chars
+          {length.toLocaleString()} / {MAX_CHARS.toLocaleString()} chars
         </span>
         <button
           type="submit"

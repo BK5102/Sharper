@@ -1,6 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Placeholder from "@tiptap/extension-placeholder";
+
 import { lint, type ApiError, type Critique, type Finding } from "@/lib/api";
 import { PasteArea } from "@/components/PasteArea";
 import { FindingCard } from "@/components/FindingCard";
@@ -11,13 +15,34 @@ export default function Home() {
   const [critique, setCritique] = useState<Critique | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [accepted, setAccepted] = useState<Finding[]>([]);
+  const [accepted, setAccepted] = useState<Set<string>>(new Set());
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        // Trim the toolbar-style features we don't need for a plain-text
+        // forecasting question paste area.
+        heading: false,
+        bulletList: false,
+        orderedList: false,
+        codeBlock: false,
+        blockquote: false,
+        horizontalRule: false,
+      }),
+      Placeholder.configure({
+        placeholder:
+          "Paste a draft forecasting question here — title and optional resolution criteria.",
+      }),
+    ],
+    content: "",
+    immediatelyRender: false, // SSR-safe per TipTap docs
+  });
 
   async function handleLint(question: string) {
     setLoading(true);
     setError(null);
     setCritique(null);
-    setAccepted([]);
+    setAccepted(new Set());
     try {
       const result = await lint(question);
       result.findings.sort(
@@ -35,12 +60,23 @@ export default function Home() {
     }
   }
 
-  function handleAccept(finding: Finding) {
-    setAccepted((prev) =>
-      prev.find((f) => f.quoted_span === finding.quoted_span)
-        ? prev
-        : [...prev, finding],
-    );
+  function findingKey(f: Finding): string {
+    return `${f.rubric_item}::${f.quoted_span}`;
+  }
+
+  /**
+   * Accept a rewrite: swap quoted_span with suggested_rewrite inside the
+   * editor in-place. If the span no longer appears in the editor (user edited
+   * since linting), surface a soft message instead of mutating.
+   */
+  function handleAccept(finding: Finding): boolean {
+    if (!editor || !finding.suggested_rewrite) return false;
+    const current = editor.getText();
+    if (!current.includes(finding.quoted_span)) return false;
+    const next = current.replace(finding.quoted_span, finding.suggested_rewrite);
+    editor.commands.setContent(next);
+    setAccepted((prev) => new Set(prev).add(findingKey(finding)));
+    return true;
   }
 
   return (
@@ -57,7 +93,7 @@ export default function Home() {
       </header>
 
       <section className="mb-10">
-        <PasteArea onSubmit={handleLint} loading={loading} />
+        <PasteArea editor={editor} onSubmit={handleLint} loading={loading} />
       </section>
 
       {error && (
@@ -74,9 +110,9 @@ export default function Home() {
                 ? "No issues found"
                 : `${critique.findings.length} finding${critique.findings.length === 1 ? "" : "s"}`}
             </h2>
-            {accepted.length > 0 && (
+            {accepted.size > 0 && (
               <span className="text-xs text-emerald-700 dark:text-emerald-400">
-                {accepted.length} rewrite{accepted.length === 1 ? "" : "s"} accepted
+                {accepted.size} rewrite{accepted.size === 1 ? "" : "s"} accepted — re-lint to verify
               </span>
             )}
           </header>
@@ -92,6 +128,7 @@ export default function Home() {
               <FindingCard
                 key={`${f.rubric_item}-${i}`}
                 finding={f}
+                accepted={accepted.has(findingKey(f))}
                 onAcceptRewrite={handleAccept}
               />
             ))}

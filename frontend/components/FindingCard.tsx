@@ -7,16 +7,21 @@ import { SeverityBadge } from "./SeverityBadge";
 
 interface Props {
   finding: Finding;
-  onAcceptRewrite?: (finding: Finding) => void;
+  accepted: boolean;
+  /**
+   * Returns true if the rewrite was applied (span still present in editor),
+   * false if the span no longer exists (user edited the text since linting).
+   */
+  onAcceptRewrite: (finding: Finding) => boolean;
 }
 
-export function FindingCard({ finding, onAcceptRewrite }: Props) {
+export function FindingCard({ finding, accepted, onAcceptRewrite }: Props) {
   const [showExplanation, setShowExplanation] = useState(false);
-  const [accepted, setAccepted] = useState(false);
+  const [missed, setMissed] = useState(false);
 
   function accept() {
-    setAccepted(true);
-    onAcceptRewrite?.(finding);
+    const applied = onAcceptRewrite(finding);
+    if (!applied) setMissed(true);
   }
 
   return (
@@ -45,7 +50,7 @@ export function FindingCard({ finding, onAcceptRewrite }: Props) {
             Suggested rewrite
           </span>
           {finding.suggested_rewrite}
-          <div className="mt-2">
+          <div className="mt-2 flex items-center gap-3">
             <button
               type="button"
               onClick={accept}
@@ -54,6 +59,11 @@ export function FindingCard({ finding, onAcceptRewrite }: Props) {
             >
               {accepted ? "Accepted ✓" : "Accept rewrite"}
             </button>
+            {missed && !accepted && (
+              <span className="text-xs text-amber-700 dark:text-amber-400">
+                Span no longer in editor — edited since lint?
+              </span>
+            )}
           </div>
         </div>
       )}
