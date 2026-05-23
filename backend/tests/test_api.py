@@ -15,6 +15,20 @@ from sharper.schema import Critique, Finding, RubricItem, Severity
 client = TestClient(app)
 
 
+@pytest.fixture(autouse=True)
+def _clear_auth_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Clear both auth env vars before every test in this file.
+
+    backend/.env (loaded by api.py via load_dotenv(override=True)) may contain
+    real CLERK_SECRET_KEY / SHARPER_API_TOKEN values when the developer has
+    set up Clerk; we don't want those bleeding into test assertions about
+    'no auth configured' behavior. Tests that need a specific auth mode
+    re-set the env vars explicitly via the same monkeypatch fixture.
+    """
+    monkeypatch.delenv("CLERK_SECRET_KEY", raising=False)
+    monkeypatch.delenv("SHARPER_API_TOKEN", raising=False)
+
+
 def _fake_critique() -> Critique:
     return Critique(
         findings=[
