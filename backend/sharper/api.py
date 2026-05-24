@@ -39,6 +39,7 @@ from starlette.responses import JSONResponse, Response
 
 from . import auth
 from .critic import MAX_INPUT_CHARS, critique_question
+from .observability import init_sentry
 from .schema import Critique
 
 # Load .env before the Anthropic client is constructed. override=True because the
@@ -52,6 +53,10 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
 logger = logging.getLogger("sharper.api")
+
+# Initialize Sentry as early as possible so any startup-time exception is
+# captured. No-op when SENTRY_DSN is unset (local dev / tests).
+init_sentry()
 
 # Request body cap. MAX_INPUT_CHARS = 4000; JSON wrapper + headers adds ~1KB.
 # 16KB leaves 4x headroom and is 64,000x smaller than what a careless attacker
