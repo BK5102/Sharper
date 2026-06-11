@@ -37,7 +37,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
-from . import auth
+from . import auth, ratelimit
 from .critic import MAX_INPUT_CHARS, critique_question
 from .observability import init_sentry
 from .schema import Critique
@@ -191,12 +191,14 @@ def health() -> dict[str, str]:
 def lint(
     req: LintRequest,
     _identity: str = Depends(auth.require_token),
+    _rl: None = Depends(ratelimit.check_rate_limit),
 ) -> Critique:
     """Lint a forecasting question against the rubric.
 
-    Requires `Authorization: Bearer <SHARPER_API_TOKEN>` when the server is
-    configured with a token. When `SHARPER_API_TOKEN` is unset, falls through
-    (anonymous dev mode -- only safe on localhost).
+    Auth: Bearer token via Clerk JWT or static SHARPER_API_TOKEN (see auth.py).
+    Rate limit: 10/hr anonymous, 60/hr authenticated, keyed by IP or Clerk
+    user_id (see ratelimit.py). Both auth-disabled and Upstash-unconfigured
+    fall through silently for local dev.
     """
     if not req.question.strip():
         raise HTTPException(status_code=400, detail="question is empty or whitespace-only")
