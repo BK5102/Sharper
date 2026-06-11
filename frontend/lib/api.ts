@@ -32,16 +32,10 @@ export interface ApiError {
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 
-// Optional bearer token. When the backend has SHARPER_API_TOKEN set, requests
-// without a matching `Authorization: Bearer <token>` header are rejected with
-// 401. This is a pre-Clerk stopgap -- the token ends up in the JS bundle and
-// is not a real per-user secret.
-const API_TOKEN = process.env.NEXT_PUBLIC_SHARPER_API_TOKEN;
-
-export async function lint(question: string): Promise<Critique> {
+export async function lint(question: string, token?: string | null): Promise<Critique> {
   const headers: Record<string, string> = { "content-type": "application/json" };
-  if (API_TOKEN) {
-    headers["authorization"] = `Bearer ${API_TOKEN}`;
+  if (token) {
+    headers["authorization"] = `Bearer ${token}`;
   }
   const resp = await fetch(`${API_BASE}/api/lint`, {
     method: "POST",

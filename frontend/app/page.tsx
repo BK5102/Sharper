@@ -4,15 +4,18 @@ import { useState } from "react";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
+import { useAuth } from "@clerk/nextjs";
 
 import { lint, type ApiError, type Critique, type Finding } from "@/lib/api";
 import { PasteArea } from "@/components/PasteArea";
 import { FindingCard } from "@/components/FindingCard";
 import { ExampleGallery } from "@/components/ExampleGallery";
+import { AuthButton } from "@/components/AuthButton";
 
 const SEVERITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };
 
 export default function Home() {
+  const { getToken } = useAuth();
   const [critique, setCritique] = useState<Critique | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +48,8 @@ export default function Home() {
     setCritique(null);
     setAccepted(new Set());
     try {
-      const result = await lint(question);
+      const token = await getToken();
+      const result = await lint(question, token);
       result.findings.sort(
         (a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity],
       );
@@ -82,15 +86,18 @@ export default function Home() {
 
   return (
     <main className="flex-1 mx-auto w-full max-w-3xl px-6 py-12">
-      <header className="mb-8">
-        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
-          Sharper
-        </h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          A linter for forecasting questions. Catches ambiguity, fuzzy
-          resolution criteria, and missing operationalization before a question
-          goes live.
-        </p>
+      <header className="mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+            Sharper
+          </h1>
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            A linter for forecasting questions. Catches ambiguity, fuzzy
+            resolution criteria, and missing operationalization before a question
+            goes live.
+          </p>
+        </div>
+        <AuthButton />
       </header>
 
       <section className="mb-10">
