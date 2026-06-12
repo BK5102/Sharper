@@ -152,11 +152,17 @@ app.add_middleware(SecurityHeadersMiddleware)
 # CORS. allow_origins is explicit (not "*"); allow_headers is tightened to the
 # only two headers the frontend sends. Production deploy must extend
 # allow_origins to include the Vercel URL.
+_extra_origins = [
+    o.strip()
+    for o in os.getenv("SHARPER_ALLOWED_ORIGINS", "").split(",")
+    if o.strip()
+]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        *_extra_origins,
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST"],
