@@ -6,6 +6,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useAuth } from "@clerk/nextjs";
 
+import Link from "next/link";
 import { lint, type ApiError, type Critique, type Finding } from "@/lib/api";
 import { PasteArea } from "@/components/PasteArea";
 import { FindingCard } from "@/components/FindingCard";
@@ -15,7 +16,7 @@ import { AuthButton } from "@/components/AuthButton";
 const SEVERITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };
 
 export default function Home() {
-  const { getToken } = useAuth();
+  const { getToken, isSignedIn } = useAuth();
   const [critique, setCritique] = useState<Critique | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -97,7 +98,17 @@ export default function Home() {
             goes live.
           </p>
         </div>
-        <AuthButton />
+        <div className="flex items-center gap-3">
+          {isSignedIn && (
+            <Link
+              href="/history"
+              className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            >
+              History
+            </Link>
+          )}
+          <AuthButton />
+        </div>
       </header>
 
       <section className="mb-10">
