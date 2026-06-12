@@ -37,7 +37,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
-from . import auth, ratelimit
+from . import auth, persistence, ratelimit
 from .critic import MAX_INPUT_CHARS, critique_question
 from .observability import init_sentry
 from .schema import Critique
@@ -196,7 +196,7 @@ def health() -> dict[str, str]:
 @app.post("/api/lint", response_model=Critique)
 def lint(
     req: LintRequest,
-    _identity: str = Depends(auth.require_token),
+    identity: str = Depends(auth.require_token),
     _rl: None = Depends(ratelimit.check_rate_limit),
 ) -> Critique:
     """Lint a forecasting question against the rubric.
@@ -209,7 +209,9 @@ def lint(
     if not req.question.strip():
         raise HTTPException(status_code=400, detail="question is empty or whitespace-only")
     try:
-        return critique_question(req.question)
+        result = critique_question(req.question)
+        persistence.save_critique(identity, req.question, result)
+        return result
     except ValueError as e:
         # critique_question raises on empty/oversized input.
         raise HTTPException(status_code=400, detail=str(e)) from e
