@@ -94,7 +94,7 @@ export default function AppPage() {
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
             Sharper
           </h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="mt-1 text-base text-zinc-600 dark:text-zinc-400">
             A linter for forecasting questions. Catches ambiguity, fuzzy
             resolution criteria, and missing operationalization before a question
             goes live.
