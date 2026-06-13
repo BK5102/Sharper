@@ -25,7 +25,7 @@ def _clear_auth_env(monkeypatch: pytest.MonkeyPatch) -> None:
     'no auth configured' behavior. Tests that need a specific auth mode
     re-set the env vars explicitly via the same monkeypatch fixture.
     """
-    monkeypatch.delenv("SUPABASE_JWT_SECRET", raising=False)
+    monkeypatch.delenv("SUPABASE_URL", raising=False)
     monkeypatch.delenv("SHARPER_API_TOKEN", raising=False)
 
 
@@ -213,6 +213,7 @@ def test_health_does_not_require_auth(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_run_refuses_public_bind_without_token(monkeypatch: pytest.MonkeyPatch) -> None:
     from sharper.api import run
 
+    monkeypatch.delenv("SUPABASE_URL", raising=False)
     monkeypatch.delenv("SHARPER_API_TOKEN", raising=False)
     monkeypatch.setenv("SHARPER_API_HOST", "0.0.0.0")
     with pytest.raises(SystemExit) as exc_info:

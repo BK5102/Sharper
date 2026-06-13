@@ -2,9 +2,11 @@
 
 Two modes, picked by which env vars are set:
 
-- **Supabase JWT** (set SUPABASE_JWT_SECRET). Verifies the Bearer token as a
-  Supabase session JWT (HS256) and returns the user UUID from the `sub` claim.
-  Production path.
+- **Supabase JWT** (set SUPABASE_URL). Verifies Bearer tokens as Supabase
+  session JWTs by fetching the project's JWKS endpoint and validating the
+  RS256/ES256 signature. Returns the user UUID from the `sub` claim.
+  Production path — no secret to rotate; the public key is fetched from
+  {SUPABASE_URL}/auth/v1/.well-known/jwks.json and cached in-process.
 - **Static bearer** (set SHARPER_API_TOKEN). Pre-shared token, constant-time
   comparison. Returns "shared-token" as the user_id placeholder. Useful for
   service-to-service calls and local dev.
@@ -22,16 +24,20 @@ import secrets
 from typing import Optional
 
 import jwt as pyjwt
+from jwt import PyJWKClient
 from fastapi import Header, HTTPException, status
 
 logger = logging.getLogger(__name__)
+
+# Module-level JWKS client cache keyed by Supabase URL.
+_JWKS_CLIENTS: dict[str, PyJWKClient] = {}
 
 
 # ----- Env-var helpers -------------------------------------------------------
 
 
-def _supabase_jwt_secret() -> Optional[str]:
-    val = os.getenv("SUPABASE_JWT_SECRET", "").strip()
+def _supabase_url() -> Optional[str]:
+    val = os.getenv("SUPABASE_URL", "").strip().rstrip("/")
     return val or None
 
 
@@ -42,7 +48,7 @@ def _expected_static_token() -> Optional[str]:
 
 def is_configured() -> bool:
     """True iff at least one auth mode is configured."""
-    return _supabase_jwt_secret() is not None or _expected_static_token() is not None
+    return _supabase_url() is not None or _expected_static_token() is not None
 
 
 # ----- JWT shape heuristic ---------------------------------------------------
@@ -54,26 +60,39 @@ def _looks_like_jwt(token: str) -> bool:
     return len(parts) == 3 and all(p for p in parts)
 
 
-# ----- Supabase JWT verification --------------------------------------------
+# ----- JWKS client -----------------------------------------------------------
+
+
+def _get_jwks_client(supabase_url: str) -> PyJWKClient:
+    if supabase_url not in _JWKS_CLIENTS:
+        jwks_url = f"{supabase_url}/auth/v1/.well-known/jwks.json"
+        _JWKS_CLIENTS[supabase_url] = PyJWKClient(jwks_url, cache_keys=True)
+    return _JWKS_CLIENTS[supabase_url]
+
+
+# ----- Supabase JWT verification ---------------------------------------------
 
 
 def _verify_supabase_jwt(token: str) -> str:
-    """Verify a Supabase session JWT and return the user UUID.
+    """Verify a Supabase session JWT via JWKS and return the user UUID.
 
     Raises HTTPException(401) on any verification failure.
+    Raises HTTPException(503) if the JWKS endpoint is unreachable.
     """
-    secret = _supabase_jwt_secret()
-    if secret is None:
+    url = _supabase_url()
+    if url is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="auth not configured",
             headers={"WWW-Authenticate": "Bearer"},
         )
     try:
+        client = _get_jwks_client(url)
+        signing_key = client.get_signing_key_from_jwt(token)
         payload = pyjwt.decode(
             token,
-            secret,
-            algorithms=["HS256"],
+            signing_key.key,
+            algorithms=["RS256", "ES256"],
             audience="authenticated",
         )
     except pyjwt.ExpiredSignatureError:
@@ -88,6 +107,12 @@ def _verify_supabase_jwt(token: str) -> str:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="invalid session token",
             headers={"WWW-Authenticate": "Bearer"},
+        )
+    except Exception as e:
+        logger.warning("JWKS fetch / JWT verify error: %s", e)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="could not verify session",
         )
 
     user_id: Optional[str] = payload.get("sub")
@@ -116,11 +141,10 @@ async def require_token(
 
     Raises HTTPException(401) when auth is configured but the request fails it.
     """
-    supabase_secret = _supabase_jwt_secret()
+    supabase_url_val = _supabase_url()
     static_token = _expected_static_token()
 
-    # Nothing configured -> dev pass-through.
-    if supabase_secret is None and static_token is None:
+    if supabase_url_val is None and static_token is None:
         return "anonymous-dev"
 
     if not authorization or not authorization.startswith("Bearer "):
@@ -133,7 +157,7 @@ async def require_token(
     presented = authorization.removeprefix("Bearer ").strip()
 
     # Supabase JWT path: try first when configured and token is JWT-shaped.
-    if supabase_secret is not None and _looks_like_jwt(presented):
+    if supabase_url_val is not None and _looks_like_jwt(presented):
         return _verify_supabase_jwt(presented)
 
     # Static bearer path.
