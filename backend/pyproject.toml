@@ -12,7 +12,7 @@ dependencies = [
     "rich>=13.7",
     "fastapi>=0.115",
     "uvicorn[standard]>=0.30",
-    "clerk-backend-api>=1.0",
+    "pyjwt>=2.8",
     "sentry-sdk[fastapi]>=2.0",
     "httpx>=0.27",  # Upstash REST + Supabase REST + FastAPI TestClient
 ]

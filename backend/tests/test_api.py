@@ -25,7 +25,7 @@ def _clear_auth_env(monkeypatch: pytest.MonkeyPatch) -> None:
     'no auth configured' behavior. Tests that need a specific auth mode
     re-set the env vars explicitly via the same monkeypatch fixture.
     """
-    monkeypatch.delenv("CLERK_SECRET_KEY", raising=False)
+    monkeypatch.delenv("SUPABASE_JWT_SECRET", raising=False)
     monkeypatch.delenv("SHARPER_API_TOKEN", raising=False)
 
 

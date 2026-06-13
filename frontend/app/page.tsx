@@ -1,168 +1,78 @@
-"use client";
-
-import { useState } from "react";
-import { useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Placeholder from "@tiptap/extension-placeholder";
-import { useAuth } from "@clerk/nextjs";
-
 import Link from "next/link";
-import { lint, type ApiError, type Critique, type Finding } from "@/lib/api";
-import { PasteArea } from "@/components/PasteArea";
-import { FindingCard } from "@/components/FindingCard";
-import { ExampleGallery } from "@/components/ExampleGallery";
-import { AuthButton } from "@/components/AuthButton";
+import type { Metadata } from "next";
 
-const SEVERITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };
+export const metadata: Metadata = {
+  title: "Sharper — Forecasting question linter",
+  description:
+    "Catches ambiguity, fuzzy resolution criteria, and missing operationalization in draft forecasting questions before they go live.",
+};
 
-export default function Home() {
-  const { getToken, isSignedIn } = useAuth();
-  const [critique, setCritique] = useState<Critique | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [accepted, setAccepted] = useState<Set<string>>(new Set());
-
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        // Trim the toolbar-style features we don't need for a plain-text
-        // forecasting question paste area.
-        heading: false,
-        bulletList: false,
-        orderedList: false,
-        codeBlock: false,
-        blockquote: false,
-        horizontalRule: false,
-      }),
-      Placeholder.configure({
-        placeholder:
-          "Paste a draft forecasting question here — title and optional resolution criteria.",
-      }),
-    ],
-    content: "",
-    immediatelyRender: false, // SSR-safe per TipTap docs
-  });
-
-  async function handleLint(question: string) {
-    setLoading(true);
-    setError(null);
-    setCritique(null);
-    setAccepted(new Set());
-    try {
-      const token = await getToken();
-      const result = await lint(question, token);
-      result.findings.sort(
-        (a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity],
-      );
-      setCritique(result);
-    } catch (e) {
-      const err = e as ApiError;
-      setError(
-        err.detail ??
-          "Network error — is the backend running on 127.0.0.1:8000?",
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function findingKey(f: Finding): string {
-    return `${f.rubric_item}::${f.quoted_span}`;
-  }
-
-  /**
-   * Accept a rewrite: swap quoted_span with suggested_rewrite inside the
-   * editor in-place. If the span no longer appears in the editor (user edited
-   * since linting), surface a soft message instead of mutating.
-   */
-  function handleAccept(finding: Finding): boolean {
-    if (!editor || !finding.suggested_rewrite) return false;
-    const current = editor.getText();
-    if (!current.includes(finding.quoted_span)) return false;
-    const next = current.replace(finding.quoted_span, finding.suggested_rewrite);
-    editor.commands.setContent(next);
-    setAccepted((prev) => new Set(prev).add(findingKey(finding)));
-    return true;
-  }
-
+export default function LandingPage() {
   return (
-    <main className="flex-1 mx-auto w-full max-w-3xl px-6 py-12">
-      <header className="mb-8 flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
-            Sharper
-          </h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-            A linter for forecasting questions. Catches ambiguity, fuzzy
-            resolution criteria, and missing operationalization before a question
-            goes live.
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          {isSignedIn && (
-            <Link
-              href="/history"
-              className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-            >
-              History
-            </Link>
-          )}
-          <AuthButton />
-        </div>
+    <main className="flex-1 mx-auto w-full max-w-3xl px-6 py-20">
+      <header className="mb-12">
+        <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
+          Sharper
+        </h1>
+        <p className="text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          A linter for forecasting questions. Catches ambiguity, fuzzy resolution
+          criteria, and missing operationalization before a question goes live.
+        </p>
       </header>
 
-      <section className="mb-10">
-        <PasteArea editor={editor} onSubmit={handleLint} loading={loading} />
+      <section className="mb-12 grid gap-6 sm:grid-cols-2">
+        <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 p-6">
+          <h2 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
+            Ambiguity detection
+          </h2>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Flags vague terms like &ldquo;significant&rdquo;, &ldquo;large&rdquo;, or &ldquo;soon&rdquo; that make
+            questions hard to resolve.
+          </p>
+        </div>
+        <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 p-6">
+          <h2 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
+            Resolution criteria
+          </h2>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Checks that your question has clear, measurable conditions for a YES
+            or NO resolution.
+          </p>
+        </div>
+        <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 p-6">
+          <h2 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
+            Operationalization
+          </h2>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Verifies concepts can be measured with concrete thresholds and
+            authoritative sources.
+          </p>
+        </div>
+        <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 p-6">
+          <h2 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
+            Rewrite suggestions
+          </h2>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Proposes targeted rewrites for each issue — one click to apply them
+            inline.
+          </p>
+        </div>
       </section>
 
-      {!critique && !loading && (
-        <ExampleGallery
-          onTry={(text) => {
-            editor?.commands.setContent(text);
-            editor?.commands.focus("end");
-          }}
-        />
-      )}
-
-      {error && (
-        <div className="mb-6 rounded-md border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/30 px-4 py-3 text-sm text-red-900 dark:text-red-100">
-          {error}
-        </div>
-      )}
-
-      {critique && (
-        <section>
-          <header className="mb-4 flex items-baseline justify-between gap-4">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-              {critique.findings.length === 0
-                ? "No issues found"
-                : `${critique.findings.length} finding${critique.findings.length === 1 ? "" : "s"}`}
-            </h2>
-            {accepted.size > 0 && (
-              <span className="text-xs text-emerald-700 dark:text-emerald-400">
-                {accepted.size} rewrite{accepted.size === 1 ? "" : "s"} accepted — re-lint to verify
-              </span>
-            )}
-          </header>
-
-          {critique.overall_assessment && (
-            <p className="mb-6 rounded-md bg-zinc-50 dark:bg-zinc-900 px-4 py-3 text-sm text-zinc-700 dark:text-zinc-300">
-              {critique.overall_assessment}
-            </p>
-          )}
-
-          <div className="flex flex-col gap-3">
-            {critique.findings.map((f, i) => (
-              <FindingCard
-                key={`${f.rubric_item}-${i}`}
-                finding={f}
-                accepted={accepted.has(findingKey(f))}
-                onAcceptRewrite={handleAccept}
-              />
-            ))}
-          </div>
-        </section>
-      )}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <Link
+          href="/auth"
+          className="inline-flex items-center justify-center rounded-md px-6 py-3 text-sm font-semibold text-white bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-colors"
+        >
+          Get started
+        </Link>
+        <Link
+          href="/auth"
+          className="inline-flex items-center justify-center rounded-md px-6 py-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+        >
+          Sign in
+        </Link>
+      </div>
     </main>
   );
 }
