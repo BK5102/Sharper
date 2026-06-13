@@ -88,30 +88,28 @@ export default function AppPage() {
   }
 
   return (
-    <main className="flex-1 mx-auto w-full max-w-3xl px-6 py-12">
-      <header className="mb-8 flex items-start justify-between gap-4">
+    <main className="flex-1 mx-auto w-full max-w-3xl px-6 py-8">
+      <header className="mb-6 flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
             Sharper
           </h1>
-          <p className="mt-1 text-base text-zinc-600 dark:text-zinc-400">
-            A linter for forecasting questions. Catches ambiguity, fuzzy
-            resolution criteria, and missing operationalization before a question
-            goes live.
+          <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
+            Forecasting question linter
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <nav className="flex items-center gap-2">
           <Link
             href="/history"
-            className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            className="rounded-md px-3 py-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors duration-150"
           >
             History
           </Link>
           <AuthButton />
-        </div>
+        </nav>
       </header>
 
-      <section className="mb-10">
+      <section className="mb-8">
         <PasteArea editor={editor} onSubmit={handleLint} loading={loading} />
       </section>
 
@@ -125,7 +123,7 @@ export default function AppPage() {
       )}
 
       {error && (
-        <div className="mb-6 rounded-md border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/30 px-4 py-3 text-sm text-red-900 dark:text-red-100">
+        <div className="mb-6 rounded-md border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 px-4 py-3 text-sm text-red-800 dark:text-red-200">
           {error}
         </div>
       )}
@@ -133,21 +131,20 @@ export default function AppPage() {
       {critique && (
         <section>
           <header className="mb-4 flex items-baseline justify-between gap-4">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
               {critique.findings.length === 0
                 ? "No issues found"
                 : `${critique.findings.length} finding${critique.findings.length === 1 ? "" : "s"}`}
             </h2>
             {accepted.size > 0 && (
               <span className="text-xs text-emerald-700 dark:text-emerald-400">
-                {accepted.size} rewrite{accepted.size === 1 ? "" : "s"} accepted
-                — re-lint to verify
+                {accepted.size} rewrite{accepted.size === 1 ? "" : "s"} accepted — re-lint to verify
               </span>
             )}
           </header>
 
           {critique.overall_assessment && (
-            <p className="mb-6 rounded-md bg-zinc-50 dark:bg-zinc-900 px-4 py-3 text-sm text-zinc-700 dark:text-zinc-300">
+            <p className="mb-4 rounded-md bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-4 py-3 text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
               {critique.overall_assessment}
             </p>
           )}
