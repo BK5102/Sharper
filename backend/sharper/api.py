@@ -244,7 +244,8 @@ def run() -> None:
     import uvicorn
 
     host = os.getenv("SHARPER_API_HOST", "127.0.0.1")
-    port = int(os.getenv("SHARPER_API_PORT", "8000"))
+    # Railway injects PORT; SHARPER_API_PORT is the local-dev override.
+    port = int(os.getenv("PORT") or os.getenv("SHARPER_API_PORT") or "8000")
     if host not in ("127.0.0.1", "localhost", "::1") and not auth.is_configured():
         raise SystemExit(
             f"refusing to bind to host={host!r} without SHARPER_API_TOKEN set. "

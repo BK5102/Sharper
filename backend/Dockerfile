@@ -9,5 +9,6 @@ COPY sharper/ ./sharper/
 # Install into the container's system Python — no venv, no PATH ambiguity
 RUN pip install --no-cache-dir -e .
 
-# Railway injects PORT; shell form expands env vars at runtime
-CMD python -m uvicorn sharper.api:app --host 0.0.0.0 --port ${PORT:-8000}
+ENV SHARPER_API_HOST=0.0.0.0
+# sharper-api calls run() which reads PORT (Railway) then SHARPER_API_PORT then 8000
+CMD ["sharper-api"]
