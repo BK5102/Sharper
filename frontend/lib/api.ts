@@ -1,7 +1,8 @@
 // Typed client for the Sharper FastAPI backend. Keep types in lockstep with
-// backend/sharper/schema.py -- update both when fields change.
+// backend/sharper/schema.py and backend/sharper/api.py -- update both when fields change.
 
 export type Severity = "low" | "medium" | "high";
+export type LintMode = "default" | "civic";
 export type RubricItem =
   | "resolution_criteria_clarity"
   | "time_bound_specification"
@@ -32,7 +33,11 @@ export interface ApiError {
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 
-export async function lint(question: string, token?: string | null): Promise<Critique> {
+export async function lint(
+  question: string,
+  token?: string | null,
+  mode: LintMode = "default",
+): Promise<Critique> {
   const headers: Record<string, string> = { "content-type": "application/json" };
   if (token) {
     headers["authorization"] = `Bearer ${token}`;
@@ -40,7 +45,7 @@ export async function lint(question: string, token?: string | null): Promise<Cri
   const resp = await fetch(`${API_BASE}/api/lint`, {
     method: "POST",
     headers,
-    body: JSON.stringify({ question }),
+    body: JSON.stringify({ question, mode }),
   });
   if (!resp.ok) {
     // FastAPI returns { detail: "..." } for 4xx; Pydantic validation returns

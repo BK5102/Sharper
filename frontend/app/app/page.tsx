@@ -7,7 +7,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { useRouter } from "next/navigation";
 
 import Link from "next/link";
-import { lint, type ApiError, type Critique, type Finding } from "@/lib/api";
+import { lint, type ApiError, type Critique, type Finding, type LintMode } from "@/lib/api";
 import { PasteArea } from "@/components/PasteArea";
 import { FindingCard } from "@/components/FindingCard";
 import { ExampleGallery } from "@/components/ExampleGallery";
@@ -16,11 +16,17 @@ import { createClient } from "@/lib/supabase-browser";
 
 const SEVERITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };
 
+const MODE_PLACEHOLDER: Record<LintMode, string> = {
+  default: "Paste a draft forecasting question — title and optional resolution criteria.",
+  civic: "Paste a goal statement or outcome question — title and resolution criteria or success definition.",
+};
+
 export default function AppPage() {
   const [critique, setCritique] = useState<Critique | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [accepted, setAccepted] = useState<Set<string>>(new Set());
+  const [mode, setMode] = useState<LintMode>("default");
   const router = useRouter();
 
   const editor = useEditor({
@@ -34,8 +40,7 @@ export default function AppPage() {
         horizontalRule: false,
       }),
       Placeholder.configure({
-        placeholder:
-          "Paste a draft forecasting question here — title and optional resolution criteria.",
+        placeholder: MODE_PLACEHOLDER["default"],
       }),
     ],
     content: "",
@@ -53,7 +58,7 @@ export default function AppPage() {
         data: { session },
       } = await supabase.auth.getSession();
       const token = session?.access_token ?? null;
-      const result = await lint(question, token);
+      const result = await lint(question, token, mode);
       result.findings.sort(
         (a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity],
       );
@@ -109,12 +114,38 @@ export default function AppPage() {
         </nav>
       </header>
 
+      <div className="mb-4 flex items-center gap-1 rounded-md border border-zinc-200 dark:border-zinc-700 p-0.5 w-fit text-xs font-medium">
+        <button
+          type="button"
+          onClick={() => setMode("default")}
+          className={`rounded px-3 py-1.5 transition-colors duration-100 ${
+            mode === "default"
+              ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900"
+              : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+          }`}
+        >
+          Prediction market
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode("civic")}
+          className={`rounded px-3 py-1.5 transition-colors duration-100 ${
+            mode === "civic"
+              ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900"
+              : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+          }`}
+        >
+          Civic / nonprofit
+        </button>
+      </div>
+
       <section className="mb-8">
         <PasteArea editor={editor} onSubmit={handleLint} loading={loading} />
       </section>
 
       {!critique && !loading && (
         <ExampleGallery
+          mode={mode}
           onTry={(text) => {
             editor?.commands.setContent(text);
             editor?.commands.focus("end");

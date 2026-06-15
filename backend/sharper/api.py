@@ -27,6 +27,7 @@ import os
 import sys
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from typing import Literal
 
 import anthropic
 from dotenv import load_dotenv
@@ -53,6 +54,10 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
 logger = logging.getLogger("sharper.api")
+
+# Kill-switch: set to True via POST /api/admin/disable to stop accepting lint requests.
+# Resets to False only on process restart. Used for soft-launch spend control.
+_DISABLED = False
 
 # Initialize Sentry as early as possible so any startup-time exception is
 # captured. No-op when SENTRY_DSN is unset (local dev / tests).
@@ -177,9 +182,13 @@ class LintRequest(BaseModel):
     question: str = Field(
         min_length=1,
         max_length=MAX_INPUT_CHARS,
+        description=f"The question or outcome statement to lint. Up to {MAX_INPUT_CHARS} characters.",
+    )
+    mode: Literal["default", "civic"] = Field(
+        default="default",
         description=(
-            f"The forecasting question to lint. Up to {MAX_INPUT_CHARS} characters. "
-            "Real Metaculus questions fit easily."
+            "'default' uses prediction-market rubric examples (Metaculus-style). "
+            "'civic' uses civic/nonprofit rubric examples (goal statements, program outcomes)."
         ),
     )
 
@@ -199,26 +208,24 @@ def lint(
     identity: str = Depends(auth.require_token),
     _rl: None = Depends(ratelimit.check_rate_limit),
 ) -> Critique:
-    """Lint a forecasting question against the rubric.
+    """Lint a question or outcome statement against the rubric.
 
-    Auth: Bearer token via Clerk JWT or static SHARPER_API_TOKEN (see auth.py).
-    Rate limit: 10/hr anonymous, 60/hr authenticated, keyed by IP or Clerk
-    user_id (see ratelimit.py). Both auth-disabled and Upstash-unconfigured
-    fall through silently for local dev.
+    Auth: Supabase JWT (Bearer) or static SHARPER_API_TOKEN (see auth.py).
+    Rate limit: 10/hr anonymous, 60/hr authenticated (see ratelimit.py).
+    mode: "default" (prediction-market) or "civic" (civic/nonprofit).
     """
+    global _DISABLED
+    if _DISABLED:
+        raise HTTPException(status_code=503, detail="linter is temporarily disabled")
     if not req.question.strip():
         raise HTTPException(status_code=400, detail="question is empty or whitespace-only")
     try:
-        result = critique_question(req.question)
+        result = critique_question(req.question, mode=req.mode)
         persistence.save_critique(identity, req.question, result)
         return result
     except ValueError as e:
-        # critique_question raises on empty/oversized input.
         raise HTTPException(status_code=400, detail=str(e)) from e
     except anthropic.APIStatusError as e:
-        # Log details server-side; return a generic categorized message to the
-        # client. We deliberately do NOT echo `e.message` -- it can carry context
-        # about the request (model, partial prompt) that we don't need to expose.
         logger.exception("anthropic APIStatusError: status=%s", e.status_code)
         if 400 <= e.status_code < 500:
             raise HTTPException(
@@ -228,6 +235,19 @@ def lint(
     except anthropic.APIError as e:
         logger.exception("anthropic APIError: %s", type(e).__name__)
         raise HTTPException(status_code=502, detail="upstream API error") from e
+
+
+@app.post("/api/admin/disable", status_code=200)
+def disable_linter(identity: str = Depends(auth.require_token)) -> dict[str, str]:
+    """Kill-switch: stop accepting /api/lint requests until process restart.
+
+    Requires auth. Use before hitting the Anthropic spend cap during soft launch.
+    Re-enable by restarting the Railway service.
+    """
+    global _DISABLED
+    _DISABLED = True
+    logger.warning("linter disabled via /api/admin/disable by identity=%s", identity)
+    return {"status": "disabled"}
 
 
 # ----- Entrypoint -----------------------------------------------------------

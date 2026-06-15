@@ -1,12 +1,14 @@
 """The rubric. Edit this file to tune the linter.
 
 Each item has a definition (what the rubric item is checking for) and example failures
-(short, concrete patterns of how the failure shows up in real forecasting questions).
-These are interpolated into the system prompt and are the primary lever for catching
-ambiguity. If the linter's findings are too generic, sharpen the definitions and failures.
+(short, concrete patterns of how the failure shows up). Two sets of examples exist per
+item: prediction-market (default) and civic/nonprofit. Both share the same 6 rubric
+items and definitions — only the illustrative examples differ.
+
+Primary tuning lever: sharpen definitions and example_failures to improve recall.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass(frozen=True)
@@ -15,6 +17,8 @@ class RubricSpec:
     name: str
     definition: str
     example_failures: tuple[str, ...]
+    # Civic/nonprofit context examples. Falls back to example_failures if empty.
+    civic_example_failures: tuple[str, ...] = field(default_factory=tuple)
 
 
 RUBRIC: tuple[RubricSpec, ...] = (
@@ -32,6 +36,14 @@ RUBRIC: tuple[RubricSpec, ...] = (
             "uncrewed flyby, crewed landing, and crewed return would all plausibly count.",
             "'Will the next US president be controversial?' — no objective standard for 'controversial'.",
         ),
+        civic_example_failures=(
+            "'The program will achieve a successful health outcome for participants' — no measurable "
+            "criterion for what success means; reviewers will disagree at evaluation time.",
+            "'The initiative will meaningfully improve the city's housing situation' — 'meaningfully "
+            "improve' has no resolution standard; improvement is not defined against any baseline.",
+            "'The nonprofit will demonstrate impact in the community' — 'demonstrate impact' specifies "
+            "neither what to measure nor what threshold counts as impact.",
+        ),
     ),
     RubricSpec(
         item_id="time_bound_specification",
@@ -47,6 +59,13 @@ RUBRIC: tuple[RubricSpec, ...] = (
             "'Will GPT-5 launch by 2025?' — 'by 2025' is ambiguous between 'before Jan 1, 2025' and "
             "'before Dec 31, 2025'.",
             "'Will the Fed cut rates soon?' — 'soon' is not a time bound.",
+        ),
+        civic_example_failures=(
+            "'Will the intervention reduce chronic homelessness over the coming years?' — 'coming years' "
+            "is not a deadline; the question can never resolve No under this criterion.",
+            "'Will the program achieve its goals by the end of the project?' — the project end date is "
+            "not fixed or publicly committed; 'end of project' cannot be independently verified.",
+            "'Will the city meet its housing goals in the near future?' — 'near future' is not a time bound.",
         ),
     ),
     RubricSpec(
@@ -65,6 +84,15 @@ RUBRIC: tuple[RubricSpec, ...] = (
             "'Will climate change cause widespread crop failure?' — 'widespread' and 'crop failure' both "
             "need measurable definitions.",
         ),
+        civic_example_failures=(
+            "'Will the diabetes prevention program achieve a significant reduction in A1C levels?' — "
+            "'significant' is not operationalized; a 0.3% drop and a 2.0% drop are both plausible "
+            "readings of 'significant'.",
+            "'Will the city substantially meet its RHNA housing target by 2029?' — 'substantially' needs "
+            "a numeric threshold (e.g. ≥80% of target units permitted).",
+            "'Will participants maintain healthy weight by program exit?' — 'healthy weight' requires a "
+            "named clinical definition (BMI range, percentage body-weight reduction, etc.).",
+        ),
     ),
     RubricSpec(
         item_id="edge_case_handling",
@@ -82,6 +110,14 @@ RUBRIC: tuple[RubricSpec, ...] = (
             "'Will the company report >$1B revenue in Q4?' — silent on what happens if the company "
             "restates earnings or never reports.",
         ),
+        civic_example_failures=(
+            "'Will housing-first participants maintain stable housing at 12 months?' — silent on what "
+            "happens if the participant moves voluntarily, is evicted, or drops out of data collection.",
+            "'Will the city permit 5,000 housing units by December 31?' — silent on whether mixed-income "
+            "units partially count or whether units lost to demolition offset new permits.",
+            "'Will program graduates secure employment within 6 months of exit?' — silent on what counts "
+            "as 'employment' (part-time? gig work?) and what happens if participant contact is lost.",
+        ),
     ),
     RubricSpec(
         item_id="source_authority",
@@ -96,6 +132,15 @@ RUBRIC: tuple[RubricSpec, ...] = (
             "'Will inflation exceed 5%?' — does not name a source (BLS CPI? Core PCE? Which release?).",
             "'Will the COVID death toll exceed X?' — 'death toll' is ambiguous between WHO, JHU, Worldometer.",
             "'According to media reports, will [event] happen?' — 'media reports' is not a specific source.",
+        ),
+        civic_example_failures=(
+            "'Will local community surveys show improved food security?' — no named survey, no sponsoring "
+            "organization, no published release schedule; source may not exist at evaluation time.",
+            "'According to available local data, will homelessness decline by 10%?' — 'available local "
+            "data' does not name the Point-in-Time count, the HUD Annual Homeless Assessment Report, or "
+            "another specific enumeration.",
+            "'Program reports will show participant success' — 'program reports' are internal and "
+            "unpublished; they are not an independently verifiable source.",
         ),
     ),
     RubricSpec(
@@ -114,12 +159,25 @@ RUBRIC: tuple[RubricSpec, ...] = (
             "— defining 'crash' as a specific price is a scope decision that should be in the title.",
             "Title implies a single event but criteria allow partial credit or cumulative resolution.",
         ),
+        civic_example_failures=(
+            "Goal statement says 'reduce food insecurity'; outcome question measures only 'food pantry "
+            "visit frequency' — pantry visits can increase when food insecurity worsens, so the metric "
+            "can move opposite to the stated goal.",
+            "Mission mentions 'economic mobility'; program evaluation criteria measure only housing "
+            "stability — the two are correlated but not the same construct.",
+            "Strategic plan says 'improve community health'; the outcome question asks about clinic visit "
+            "counts — utilization is not the same as health status.",
+        ),
     ),
 )
 
 
-def rubric_as_prompt_block() -> str:
-    """Render the rubric as a single text block for the system prompt."""
+def rubric_as_prompt_block(mode: str = "default") -> str:
+    """Render the rubric as a text block for the system prompt.
+
+    mode="default" uses prediction-market examples.
+    mode="civic" uses civic/nonprofit examples (falls back to default if not defined).
+    """
     lines: list[str] = []
     for spec in RUBRIC:
         lines.append(f"## {spec.name}  (id: `{spec.item_id}`)")
@@ -127,7 +185,12 @@ def rubric_as_prompt_block() -> str:
         lines.append(spec.definition)
         lines.append("")
         lines.append("Example failures:")
-        for ex in spec.example_failures:
+        examples = (
+            spec.civic_example_failures or spec.example_failures
+            if mode == "civic"
+            else spec.example_failures
+        )
+        for ex in examples:
             lines.append(f"- {ex}")
         lines.append("")
     return "\n".join(lines).rstrip()

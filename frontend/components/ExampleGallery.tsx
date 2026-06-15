@@ -1,27 +1,39 @@
 "use client";
 
 import { EXAMPLES, type Example } from "@/lib/examples";
-import { RUBRIC_ITEM_LABELS } from "@/lib/api";
+import { RUBRIC_ITEM_LABELS, type LintMode } from "@/lib/api";
 import { SeverityBadge } from "./SeverityBadge";
 
 interface Props {
   onTry: (questionText: string) => void;
+  mode: LintMode;
 }
 
-export function ExampleGallery({ onTry }: Props) {
+const MODE_COPY: Record<LintMode, { heading: string; sub: string }> = {
+  default: {
+    heading: "What Sharper catches",
+    sub: "Prediction-market examples — click any to load into the editor.",
+  },
+  civic: {
+    heading: "What Sharper catches",
+    sub: "Civic and nonprofit examples — click any to load into the editor.",
+  },
+};
+
+export function ExampleGallery({ onTry, mode }: Props) {
+  const examples = EXAMPLES.filter((ex) => ex.mode === mode);
+  const copy = MODE_COPY[mode];
   return (
     <section>
       <header className="mb-3">
         <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-          See what Sharper catches
+          {copy.heading}
         </h2>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-500">
-          Real before / after examples. Click any to load it into the editor.
-        </p>
+        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-500">{copy.sub}</p>
       </header>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {EXAMPLES.map((ex) => (
-          <ExampleCard key={ex.label} example={ex} onTry={onTry} />
+        {examples.map((ex) => (
+          <ExampleCard key={ex.label + ex.mode} example={ex} onTry={onTry} />
         ))}
       </div>
     </section>
