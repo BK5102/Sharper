@@ -52,8 +52,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    "/(api|trpc)(.*)",
-  ],
+  // Only run on routes that need auth — /app, /history, and /auth.
+  // Skipping the landing page avoids a Supabase round-trip on every public page load.
+  matcher: ["/app(.*)", "/history(.*)", "/auth(.*)"],
 };

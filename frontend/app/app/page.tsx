@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Placeholder from "@tiptap/extension-placeholder";
 import { useRouter } from "next/navigation";
 
 import Link from "next/link";
@@ -27,6 +26,7 @@ export default function AppPage() {
   const [error, setError] = useState<string | null>(null);
   const [accepted, setAccepted] = useState<Set<string>>(new Set());
   const [mode, setMode] = useState<LintMode>("default");
+  const [signedIn, setSignedIn] = useState(false);
   const router = useRouter();
 
   const editor = useEditor({
@@ -38,9 +38,6 @@ export default function AppPage() {
         codeBlock: false,
         blockquote: false,
         horizontalRule: false,
-      }),
-      Placeholder.configure({
-        placeholder: MODE_PLACEHOLDER["default"],
       }),
     ],
     content: "",
@@ -58,6 +55,7 @@ export default function AppPage() {
         data: { session },
       } = await supabase.auth.getSession();
       const token = session?.access_token ?? null;
+      setSignedIn(Boolean(session?.user));
       const result = await lint(question, token, mode);
       result.findings.sort(
         (a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity],
@@ -104,13 +102,15 @@ export default function AppPage() {
           </p>
         </div>
         <nav className="flex items-center gap-2">
-          <Link
-            href="/history"
-            className="rounded-md px-3 py-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors duration-150"
-          >
-            History
-          </Link>
-          <AuthButton />
+          {signedIn && (
+            <Link
+              href="/history"
+              className="rounded-md px-3 py-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors duration-150"
+            >
+              History
+            </Link>
+          )}
+          <AuthButton onAuthChange={setSignedIn} />
         </nav>
       </header>
 
@@ -140,7 +140,12 @@ export default function AppPage() {
       </div>
 
       <section className="mb-8">
-        <PasteArea editor={editor} onSubmit={handleLint} loading={loading} />
+        <PasteArea
+          editor={editor}
+          onSubmit={handleLint}
+          loading={loading}
+          placeholder={MODE_PLACEHOLDER[mode]}
+        />
       </section>
 
       {!critique && !loading && (

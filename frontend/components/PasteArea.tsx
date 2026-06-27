@@ -10,15 +10,16 @@ interface Props {
   editor: Editor | null;
   onSubmit: (question: string) => void;
   loading: boolean;
+  placeholder: string;
 }
 
-export function PasteArea({ editor, onSubmit, loading }: Props) {
+export function PasteArea({ editor, onSubmit, loading, placeholder }: Props) {
   const [text, setText] = useState("");
 
   useEffect(() => {
     if (!editor) return;
-    setText(editor.getText());
     const handler = () => setText(editor.getText());
+    queueMicrotask(handler);
     editor.on("update", handler);
     return () => { editor.off("update", handler); };
   }, [editor]);
@@ -36,7 +37,12 @@ export function PasteArea({ editor, onSubmit, loading }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      <div className="min-h-[11rem] w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-4 py-3 text-base text-zinc-900 dark:text-zinc-100 focus-within:ring-2 focus-within:ring-zinc-900 dark:focus-within:ring-zinc-100 focus-within:border-transparent transition-shadow duration-100 [&_.ProseMirror]:min-h-[9rem] [&_.ProseMirror]:outline-none [&_.ProseMirror_p.is-editor-empty:first-child]:before:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child]:before:text-zinc-400 [&_.ProseMirror_p.is-editor-empty:first-child]:before:float-left [&_.ProseMirror_p.is-editor-empty:first-child]:before:pointer-events-none">
+      <div className="relative min-h-[11rem] w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-4 py-3 text-base text-zinc-900 dark:text-zinc-100 focus-within:ring-2 focus-within:ring-zinc-900 dark:focus-within:ring-zinc-100 focus-within:border-transparent transition-shadow duration-100 [&_.ProseMirror]:min-h-[9rem] [&_.ProseMirror]:outline-none">
+        {tooShort && (
+          <div className="pointer-events-none absolute left-4 top-3 text-zinc-400 dark:text-zinc-500">
+            {placeholder}
+          </div>
+        )}
         <EditorContent editor={editor} />
       </div>
       <div className="flex items-center justify-between">

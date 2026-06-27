@@ -4,7 +4,7 @@
 // default integrations, but this hook catches the field if it leaks via any
 // other path (breadcrumbs from fetch, custom contexts, etc).
 
-import type { ErrorEvent, EventHint } from "@sentry/nextjs";
+import type { ErrorEvent } from "@sentry/nextjs";
 
 const SCRUBBED = "[SCRUBBED]";
 
@@ -29,7 +29,7 @@ function scrubJsonStringField(value: unknown): unknown {
   return value;
 }
 
-export function scrubQuestion(event: ErrorEvent, _hint?: EventHint): ErrorEvent | null {
+export function scrubQuestion(event: ErrorEvent): ErrorEvent | null {
   // request.data may be a dict or a JSON-encoded string
   if (event.request) {
     if (event.request.data) {

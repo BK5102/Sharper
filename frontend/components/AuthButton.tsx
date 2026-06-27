@@ -5,7 +5,11 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase-browser";
 import type { User } from "@supabase/supabase-js";
 
-export function AuthButton() {
+interface Props {
+  onAuthChange?: (signedIn: boolean) => void;
+}
+
+export function AuthButton({ onAuthChange }: Props) {
   const [user, setUser] = useState<User | null>(null);
   const [loaded, setLoaded] = useState(false);
   const router = useRouter();
@@ -14,15 +18,17 @@ export function AuthButton() {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user);
+      onAuthChange?.(Boolean(data.user));
       setLoaded(true);
     });
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      onAuthChange?.(Boolean(session?.user));
     });
     return () => subscription.unsubscribe();
-  }, []);
+  }, [onAuthChange]);
 
   if (!loaded) {
     return <div className="h-8 w-20 rounded-md bg-zinc-100 dark:bg-zinc-800 animate-pulse" />;
