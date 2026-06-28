@@ -22,14 +22,17 @@ Plain messages only. No `Co-Authored-By: Claude` footer, no emoji.
 - Supabase history page uses raw `fetch()` against PostgREST — no SDK (avoids realtime-js Vercel build failure).
 - `_clear_auth_env` fixture in `test_api.py` clears Upstash vars between tests to prevent 429s.
 - `SHARPER_ALLOWED_ORIGINS` env var must include the Vercel URL on Railway or CORS blocks the frontend.
+- Supabase free tier pauses after ~1 week of inactivity → auth "failed to fetch" + JWKS fetch fails on Railway. Restore in Supabase dashboard.
+- `pyjwt.PyJWKClientError` is NOT a subclass of `InvalidTokenError` — must be caught explicitly before `ExpiredSignatureError` in `auth.py` or JWKS failures are silently swallowed.
+- Next.js middleware matcher must be narrowed to `/app(.*)`, `/history(.*)`, `/auth(.*)` only — broad matcher calls `getUser()` on every public page, adding a Supabase round-trip to the landing page.
 
 ## Current blockers
-- `ANTHROPIC_API_KEY` not set on Railway → prod `/api/lint` returns 502 on every call.
-- Daily Anthropic spend cap not yet set — required before soft launch.
+- **Daily Anthropic spend cap** not set — required before soft launch (console.anthropic.com → API key → Usage limits, $5/day).
+- **Railway `SUPABASE_URL`** — confirm set to `https://tljqzpqqkbveipnnuspu.supabase.co`; "could not verify session" on lint is a Railway→Supabase JWKS failure.
 
 ## Pending (priority order)
-1. Add `ANTHROPIC_API_KEY` to Railway, redeploy, smoke-test full flow.
-2. Set $5/day spend cap at console.anthropic.com.
+1. Confirm Railway `SUPABASE_URL` is set; smoke-test lint end-to-end in prod.
+2. Set $5/day Anthropic spend cap.
 3. PostHog analytics (rubric firing rates, rewrite acceptance, abandonment).
 4. Methodology writeup linked from README.
 5. Soft launch to Metaculus / EA Forum / forecasting communities.
