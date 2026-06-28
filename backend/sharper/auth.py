@@ -24,7 +24,7 @@ import secrets
 from typing import Optional
 
 import jwt as pyjwt
-from jwt import PyJWKClient
+from jwt import PyJWKClient, PyJWKClientConnectionError, PyJWKClientError, PyJWKError
 from fastapi import Header, HTTPException, status
 
 logger = logging.getLogger(__name__)
@@ -95,6 +95,26 @@ def _verify_supabase_jwt(token: str) -> str:
             algorithms=["RS256", "ES256"],
             audience="authenticated",
         )
+    except PyJWKClientConnectionError as e:
+        logger.warning("JWKS endpoint unreachable (%s): %s", url, e)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="could not verify session — auth service temporarily unavailable",
+        )
+    except PyJWKError as e:
+        # No key in JWKS matches the JWT kid — Supabase may still be warming up
+        # after a pause, or the signing key rotated.
+        logger.warning("JWKS key lookup failed (%s): %s", url, e)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="could not verify session — no matching signing key",
+        )
+    except PyJWKClientError as e:
+        logger.warning("JWKS client error (%s): %s", url, e)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="could not verify session",
+        )
     except pyjwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -109,7 +129,7 @@ def _verify_supabase_jwt(token: str) -> str:
             headers={"WWW-Authenticate": "Bearer"},
         )
     except Exception as e:
-        logger.warning("JWKS fetch / JWT verify error: %s", e)
+        logger.warning("unexpected JWT verify error (%s): %s", type(e).__name__, e)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="could not verify session",
